@@ -1,3 +1,3 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using Jenbot;
 
-Console.WriteLine("Hello, World!");
+await new Bot().Start();
