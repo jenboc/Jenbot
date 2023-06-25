@@ -8,18 +8,17 @@ public class Bot
 {
     private readonly DiscordSocketClient _client;
     private readonly BotConfig _config;
-    private readonly InteractionHandler _interactionHandler;
     
     private const string CONFIG_FILE = "appsettings.json";
 
     public Bot()
     {
-        _interactionHandler = new InteractionHandler();
-        
         _client = new DiscordSocketClient();
         _client.Log += Log;
         _client.Ready += Ready;
-        _client.SlashCommandExecuted += _interactionHandler.HandleSlashCommand;
+        _client.SlashCommandExecuted += InteractionManager.HandleSlashCommand;
+        _client.ButtonExecuted += InteractionManager.HandleComponents;
+        _client.SelectMenuExecuted += InteractionManager.HandleComponents;
 
         var configFile = new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
@@ -39,7 +38,7 @@ public class Bot
 
     private async Task Ready()
     {
-        await _client.BulkOverwriteGlobalApplicationCommandsAsync(_interactionHandler.PrepCommandsForOverwrite().ToArray());
+        await _client.BulkOverwriteGlobalApplicationCommandsAsync(InteractionManager.PrepCommandsForOverwrite().ToArray());
     }
 
     private Task Log(LogMessage message)
