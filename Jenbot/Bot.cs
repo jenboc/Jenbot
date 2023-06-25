@@ -6,16 +6,20 @@ namespace Jenbot;
 
 public class Bot
 {
-    private DiscordSocketClient _client;
-    private BotConfig _config;
+    private readonly DiscordSocketClient _client;
+    private readonly BotConfig _config;
+    private readonly InteractionHandler _interactionHandler;
     
     private const string CONFIG_FILE = "appsettings.json";
 
     public Bot()
     {
+        _interactionHandler = new InteractionHandler();
+        
         _client = new DiscordSocketClient();
         _client.Log += Log;
         _client.Ready += Ready;
+        _client.SlashCommandExecuted += _interactionHandler.HandleSlashCommand;
 
         var configFile = new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
@@ -35,7 +39,7 @@ public class Bot
 
     private async Task Ready()
     {
-        // Prepare commands 
+        await _client.BulkOverwriteGlobalApplicationCommandsAsync(_interactionHandler.PrepCommandsForOverwrite().ToArray());
     }
 
     private Task Log(LogMessage message)
