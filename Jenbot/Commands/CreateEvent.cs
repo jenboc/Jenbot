@@ -19,29 +19,19 @@ public class CreateEvent : ICommand
         var options = new CommandOptions(command);
 
         var eventType = ParseEventType(options.Channel, options.PhysicalLocation, options.EndDate, options.EndTime);
+
+        if (eventType == GuildScheduledEventType.External && options.EndTime != null)
+            options.EndDate ??= options.StartDate; 
         
-        // Start datetime must be provided
-        var datesValid = DateIsValid(options.StartDate);
-        var timesValid = TimeIsValid(options.StartTime);
+        var startDate = ParseDateTime(options.StartDate, options.StartTime);
+        var endDate = ParseDateTime(options.EndDate, options.EndTime);
 
-        if (eventType == GuildScheduledEventType.External)
+        if (startDate == null ||
+            ((endDate == null || endDate < startDate) && eventType == GuildScheduledEventType.External))
         {
-            options.EndDate ??= options.StartDate;
-
-            // End start times only provided if it is an external event
-            datesValid = datesValid && DateIsValid(options.EndDate);
-            timesValid = timesValid && TimeIsValid(options.EndTime);
-        }
-
-        if (!datesValid)
-        {
-            await command.RespondAsync($"{command.User.Mention}, please ensure dates are sent as DD/MM/YYYY format");
-            return;
-        }
-
-        if (!timesValid)
-        {
-            await command.RespondAsync($"{command.User.Mention}, please ensure times are sent in HH:MM 24hr format");
+            await command.RespondAsync($"{command.User.Mention}, please ensure that dates and times are entered " +
+                                       $"in the correct format; and that if it is a physical event, you provide a end" +
+                                       $" date and time");
             return;
         }
 
@@ -63,13 +53,19 @@ public class CreateEvent : ICommand
     
     private DateTimeOffset? ParseDateTime(string? date, string? time)
     {
-        if (date == null && time == null)
-            return null;
+        date ??= DateTime.Now.ToString("dd/MM/yyyy");
         
-        var splitTime = time.Split(":").Select(int.Parse).ToArray();
-        var splitDate = date.Split("/").Select(int.Parse).ToArray();
+        var splitTime = time?.Split(":").Select(int.Parse).ToArray();
+        var splitDate = date?.Split("/").Select(int.Parse).ToArray();
+
+        if (splitTime == null || splitDate == null || splitTime.Length != 2 || splitDate.Length != 3)
+            return null;
+
         var dateTime = new DateTime(splitDate[2], splitDate[1], splitDate[0], splitTime[0],
             splitTime[1], 0);
+
+        if (dateTime < DateTime.Now) 
+            return null;
 
         return new DateTimeOffset(dateTime);
     }
@@ -100,11 +96,8 @@ public class CreateEvent : ICommand
 
         try
         {
-            if (int.Parse(split[2]) < currentYear || int.Parse(split[1]) > 12 || int.Parse(split[1]) < 1)
-                return false;
-
-            return int.Parse(split[0]) >= 1 &&
-                   int.Parse(split[0]) <= DateTime.DaysInMonth(int.Parse(split[2]), int.Parse(split[1]));
+            var datetime = new DateTime(int.Parse(split[2]), int.Parse(split[1]), int.Parse(split[0]));
+            return datetime < DateTime.Now;
         }
         catch
         {
@@ -136,7 +129,7 @@ public class CreateEvent : ICommand
 
         var startDate = new SlashCommandOptionBuilder().WithName("date")
             .WithDescription("Date of the event (DD/MM/YYYY)")
-            .WithRequired(true)
+            .WithRequired(false)
             .WithType(ApplicationCommandOptionType.String);
 
         var startTime = new SlashCommandOptionBuilder().WithName("time")
@@ -186,7 +179,7 @@ public class CreateEvent : ICommand
     private struct CommandOptions
     {
         public string EventName { get; set; }
-        public string StartDate { get; set; }
+        public string? StartDate { get; set; }
         public string StartTime { get; set; }
         public string? EndDate { get; set; }
         public string? EndTime { get; set; }
