@@ -26,6 +26,8 @@ public class CreateEvent : ICommand
 
         if (eventType == GuildScheduledEventType.External)
         {
+            options.EndDate ??= options.StartDate;
+
             // End start times only provided if it is an external event
             datesValid = datesValid && DateIsValid(options.EndDate);
             timesValid = timesValid && TimeIsValid(options.EndTime);
@@ -82,7 +84,7 @@ public class CreateEvent : ICommand
         if (channel is IVoiceChannel)
             return GuildScheduledEventType.Voice;
 
-        if (physicalLocation != null && endDate != null && endTime != null)
+        if (physicalLocation != null && endTime != null)
             return GuildScheduledEventType.External;
 
         return GuildScheduledEventType.None;
