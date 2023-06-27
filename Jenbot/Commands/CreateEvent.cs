@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.ComponentModel;
 using Discord;
 using Discord.WebSocket;
 
@@ -17,46 +18,74 @@ public class CreateEvent : ICommand
     {
         var options = new CommandOptions(command);
 
-        if (!DateIsValid(options.StartDate))
+        var eventType = ParseEventType(options.Channel, options.PhysicalLocation, options.EndDate, options.EndTime);
+        
+        // Start datetime must be provided
+        var datesValid = DateIsValid(options.StartDate);
+        var timesValid = TimeIsValid(options.StartTime);
+
+        if (eventType == GuildScheduledEventType.External)
         {
-            await command.RespondAsync($"{command.User.Mention}, you did not enter a valid date");
+            // End start times only provided if it is an external event
+            datesValid = datesValid && DateIsValid(options.EndDate);
+            timesValid = timesValid && TimeIsValid(options.EndTime);
+        }
+
+        if (!datesValid)
+        {
+            await command.RespondAsync($"{command.User.Mention}, please ensure dates are sent as DD/MM/YYYY format");
             return;
         }
 
-        if (!TimeIsValid(options.StartTime))
+        if (!timesValid)
         {
-            await command.RespondAsync($"{command.User.Mention}, you did not mention a valid time");
+            await command.RespondAsync($"{command.User.Mention}, please ensure times are sent in HH:MM 24hr format");
             return;
         }
 
-        var channel = command.Channel as SocketGuildChannel;
-        var guild = channel?.Guild;
+        var guild = (command.Channel as SocketGuildChannel)?.Guild;
 
-        if (guild != null)
-            await guild.CreateEventAsync(options.EventName, ParseDateTime(options.StartDate, options.StartTime),
-                ParseEventType(options.Channel, options.PhysicalLocation), description: options.Description,
+        try
+        {
+            await guild.CreateEventAsync(options.EventName, ParseDateTime(options.StartDate, options.StartTime).Value,
+                eventType, description: options.Description, endTime: ParseDateTime(options.EndDate, options.EndTime),
                 channelId: options.Channel?.Id, location: options.PhysicalLocation);
-    }
 
-    // TODO: ParseDateTime
-    private DateTimeOffset ParseDateTime(string startDate, string startTime)
+            await command.RespondAsync("Event created successfully"); 
+        }
+        catch
+        {
+            await command.RespondAsync("There was a problem trying to create that event");
+        }
+    }
+    
+    private DateTimeOffset? ParseDateTime(string? date, string? time)
     {
-        var time = startTime.Split(":").Select(int.Parse).ToArray();
-        var date = startDate.Split("/").Select(int.Parse).ToArray();
-        var dateTime = new DateTime(date[2], date[1], date[0], time[0], time[1], 0);
+        if (date == null && time == null)
+            return null;
+        
+        var splitTime = time.Split(":").Select(int.Parse).ToArray();
+        var splitDate = date.Split("/").Select(int.Parse).ToArray();
+        var dateTime = new DateTime(splitDate[2], splitDate[1], splitDate[0], splitTime[0],
+            splitTime[1], 0);
 
         return new DateTimeOffset(dateTime);
     }
     
-    // TODO: ParseEventType
-    private GuildScheduledEventType ParseEventType(IGuildChannel? channel, string? physicalLocation)
+    private GuildScheduledEventType ParseEventType(IGuildChannel? channel, string? physicalLocation, 
+        string? endDate, string? endTime)
     {
-        return channel switch
-        {
-            null when physicalLocation == null => GuildScheduledEventType.None,
-            IVoiceChannel => GuildScheduledEventType.Voice,
-            _ => GuildScheduledEventType.External
-        };
+        // Voice if voice channel provided
+        // External required physical location and end datetime 
+        // Otherwise, None event type
+
+        if (channel is IVoiceChannel)
+            return GuildScheduledEventType.Voice;
+
+        if (physicalLocation != null && endDate != null && endTime != null)
+            return GuildScheduledEventType.External;
+
+        return GuildScheduledEventType.None;
     }
     
     private bool DateIsValid(string dateInput)
@@ -67,19 +96,33 @@ public class CreateEvent : ICommand
         if (split.Length != 3)
             return false;
 
-        if (int.Parse(split[2]) < currentYear || int.Parse(split[1]) > 12 || int.Parse(split[1]) < 1)
-            return false;
+        try
+        {
+            if (int.Parse(split[2]) < currentYear || int.Parse(split[1]) > 12 || int.Parse(split[1]) < 1)
+                return false;
 
-        return int.Parse(split[0]) >= 1 &&
-               int.Parse(split[0]) <= DateTime.DaysInMonth(int.Parse(split[2]), int.Parse(split[1]));
+            return int.Parse(split[0]) >= 1 &&
+                   int.Parse(split[0]) <= DateTime.DaysInMonth(int.Parse(split[2]), int.Parse(split[1]));
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private bool TimeIsValid(string timeInput)
     {
         var split = timeInput.Split(":");
 
-        return split.Length == 2 && (int.Parse(split[0]) >= 0 && int.Parse(split[0]) < 24)
-                                 && (int.Parse(split[1]) >= 0 && int.Parse(split[1]) < 60);
+        try
+        {
+            return split.Length == 2 && (int.Parse(split[0]) >= 0 && int.Parse(split[0]) < 24)
+                                     && (int.Parse(split[1]) >= 0 && int.Parse(split[1]) < 60);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public SlashCommandBuilder GetCommandBuilder()
@@ -114,6 +157,16 @@ public class CreateEvent : ICommand
             .WithRequired(false)
             .WithType(ApplicationCommandOptionType.String);
         
+        var endDate = new SlashCommandOptionBuilder().WithName("end-date")
+            .WithDescription("End date of the event (DD/MM/YYYY)")
+            .WithRequired(false)
+            .WithType(ApplicationCommandOptionType.String);
+
+        var endTime = new SlashCommandOptionBuilder().WithName("end-time")
+            .WithDescription("End time of the event (24hr format)")
+            .WithRequired(false)
+            .WithType(ApplicationCommandOptionType.String);
+        
         // TODO: Add cover image
 
         return new SlashCommandBuilder().WithName(Name)
@@ -123,7 +176,9 @@ public class CreateEvent : ICommand
             .AddOption(startTime)
             .AddOption(description)
             .AddOption(channel)
-            .AddOption(physicalLocation);
+            .AddOption(physicalLocation)
+            .AddOption(endDate)
+            .AddOption(endTime);
     }
     
     private struct CommandOptions
@@ -131,6 +186,8 @@ public class CreateEvent : ICommand
         public string EventName { get; set; }
         public string StartDate { get; set; }
         public string StartTime { get; set; }
+        public string? EndDate { get; set; }
+        public string? EndTime { get; set; }
         public string? Description { get; set; }
         public IGuildChannel? Channel { get; set; }
         public string? PhysicalLocation { get; set; }
@@ -158,6 +215,12 @@ public class CreateEvent : ICommand
                         break;
                     case "physical-location":
                         PhysicalLocation = (string)option.Value;
+                        break;
+                    case "end-date":
+                        EndDate = (string)option.Value;
+                        break;
+                    case "end-time":
+                        EndTime = (string)option.Value;
                         break;
                 }
             }
