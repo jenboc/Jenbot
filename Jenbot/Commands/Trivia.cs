@@ -26,13 +26,9 @@ public class Trivia : ICommand
             return;
         }
 
-        var questionEmbed = BuildQuestionEmbed(question);
+        var questionEmbed = new TriviaEmbed(question);
+        InteractionManager.AddHandler(questionEmbed);
         await questionEmbed.Reply(command);
-    }
-
-    private QuestionEmbed BuildQuestionEmbed(TriviaQuestion question)
-    {
-        return new MultipleChoiceQuestion(question);
     }
 
     public SlashCommandBuilder GetCommandBuilder() => new SlashCommandBuilder()

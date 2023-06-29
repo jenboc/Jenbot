@@ -1,19 +1,20 @@
 using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Jenbot.Trivia;
 
 public class TriviaQuestion
 {
-    [JsonPropertyName("category")]
+    [JsonProperty("category")]
     public string Category { get; private set; }
-    [JsonPropertyName("type")]
+    [JsonProperty("type")]
     public string Type { get; private set; }
-    [JsonPropertyName("difficulty")]
+    [JsonProperty("difficulty")]
     public string Difficulty { get; private set; }
-    [JsonPropertyName("question")]
+    [JsonProperty("question")]
     public string Question { get; private set; }
-    [JsonPropertyName("correct_answer")]
+    [JsonProperty("correct_answer")]
     public string CorrectAnswer { get; private set; }
-    [JsonPropertyName("incorrect_answers")]
-    public List<string> IncorrectAnswers { get; private set; }
+    [JsonProperty("incorrect_answers")]
+    public string[] IncorrectAnswers { get; private set; }
 }

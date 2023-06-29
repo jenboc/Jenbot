@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using Newtonsoft.Json;
 
 namespace Jenbot.Trivia;
 
@@ -18,9 +19,9 @@ public class TriviaApi
 
     public async Task<TriviaQuestion?> GetQuestion()
     {
-        var rawResponse = await _httpClient.GetAsync(BASE_URL);
-        var parsedResponse = await rawResponse.Content.ReadFromJsonAsync<ApiResponse>();
-
+        var rawResponse = await _httpClient.GetStringAsync(BASE_URL);
+        var parsedResponse = JsonConvert.DeserializeObject<ApiResponse>(rawResponse); 
+        
         return parsedResponse?.Questions.First();
     }
 }

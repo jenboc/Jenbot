@@ -1,11 +1,12 @@
 using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Jenbot.Trivia;
 
 internal class ApiResponse
 {
-    [JsonPropertyName("response_code")]
+    [JsonProperty("response_code")]
     public int ResponseCode { get; private set; }
-    [JsonPropertyName("results")]
-    public List<TriviaQuestion> Questions { get; private set; }
+    [JsonProperty("results")]
+    public TriviaQuestion[] Questions { get; private set; }
 }
