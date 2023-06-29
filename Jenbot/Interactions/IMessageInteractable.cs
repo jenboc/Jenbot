@@ -5,5 +5,5 @@ namespace Jenbot.Interactions;
 public interface IMessageInteractable
 {
     public Task Reply(SocketInteraction interaction);
-    public Task Send(SocketTextChannel channel);
+    public Task Send(ISocketMessageChannel channel);
 }

@@ -28,7 +28,10 @@ public class Trivia : ICommand
 
         var questionEmbed = new TriviaEmbed(question);
         InteractionManager.AddHandler(questionEmbed);
-        await questionEmbed.Reply(command);
+
+        await command.DeferAsync();
+        await questionEmbed.Send(command.Channel);
+        await command.DeleteOriginalResponseAsync();
     }
 
     public SlashCommandBuilder GetCommandBuilder() => new SlashCommandBuilder()

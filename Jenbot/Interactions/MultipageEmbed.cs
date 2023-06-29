@@ -21,7 +21,7 @@ public class MultipageEmbed : Handler, IMessageInteractable
     public async Task Reply(SocketInteraction interaction) => 
         await interaction.RespondAsync(embed: CurrentEmbed, components: MsgComponent);
 
-    public async Task Send(SocketTextChannel channel) =>
+    public async Task Send(ISocketMessageChannel channel) =>
         await channel.SendMessageAsync(embed: CurrentEmbed, components: MsgComponent);
     
     private MessageComponent BuildComponent(string selected)
