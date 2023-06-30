@@ -5,14 +5,14 @@ namespace Jenbot.Chess;
 public class Tournament
 {
     [JsonProperty("count")]
-    public int Count { get; }
+    public int Count { get; private set; }
     
     [JsonProperty("withdraw")]
-    public int Withdrawn { get; }
+    public int Withdrawn { get; private set; }
     
     [JsonProperty("points")]
-    public int TotalPoints { get; }
+    public int TotalPoints { get; private set; }
     
     [JsonProperty("highest_finish")]
-    public int HighestFinish { get; }
+    public int HighestFinish { get; private set; }
 }

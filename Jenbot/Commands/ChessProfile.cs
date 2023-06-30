@@ -23,12 +23,20 @@ public class ChessProfile : ICommand
 
         try
         {
+            var profile = playerData.Profile;
+            var username = profile.Username;
+            var stats = playerData.Stats;
+            var rapidStats = stats.RapidChess;
+            var bestGame = rapidStats.BestGame;
+            var url = bestGame.GameUrl;
+            
             await command.RespondAsync(
-                $"{playerData.Profile.Username}: {playerData.Stats.RapidChess.BestGame.GameUrl}");
+                $"{username}: {url}");
         }
-        catch
+        catch (Exception e)
         {
             await command.RespondAsync($"There was a problem processing your request, {command.User.Mention}");
+            Console.WriteLine(e);
         }
     }
 

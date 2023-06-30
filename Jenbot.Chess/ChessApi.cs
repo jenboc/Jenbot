@@ -22,24 +22,24 @@ public class ChessApi
 
     private async Task<T?> GetDataAsync<T>(string endpoint)
     {
-        Console.WriteLine(endpoint);
+        try
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, endpoint);
+            requestMessage.Headers.Add("User-Agent", DEFAULT_USER_AGENT);
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, endpoint); 
-        requestMessage.Headers.Add("User-Agent", DEFAULT_USER_AGENT);
-        var response = await _httpClient.SendAsync(requestMessage);
-        var raw = await response.Content.ReadAsStringAsync();
-        
-        Console.WriteLine(raw);
-        return JsonConvert.DeserializeObject<T>(raw);
+            var raw = await (await _httpClient.SendAsync(requestMessage)).Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<T>(raw);
+        }
+        catch
+        {
+            return default;
+        }
     }
 
     public async Task<Player?> GetPlayerAsync(string username)
     {
-        /*var profile = await GetDataAsync<Profile>(PROFILE_ENDPOINT.Replace(USERNAME_PLACEHOLDER, username));
-        var stats = await GetDataAsync<Stats>(STATS_ENDPOINT.Replace(USERNAME_PLACEHOLDER, username));*/
-
-        var profile = await GetDataAsync<Profile>("https://api.chess.com/pub/player/abyssmisty");
-        var stats = await GetDataAsync<Stats>("https://api.chess.com/pub/player/abyssmisty/stats");
+        var profile = await GetDataAsync<Profile>(PROFILE_ENDPOINT.Replace(USERNAME_PLACEHOLDER, username));
+        var stats = await GetDataAsync<Stats>(STATS_ENDPOINT.Replace(USERNAME_PLACEHOLDER, username));
         
         return profile != null && stats != null ? new Player(profile, stats) : null; 
     }
