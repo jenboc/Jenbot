@@ -1,3 +1,4 @@
+using System.Web;
 using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
@@ -54,7 +55,7 @@ public class TriviaEmbed : Handler, IMessageInteractable
             var button = comp as ButtonComponent;
 
             var editedButton = new ButtonBuilder()
-                .WithLabel(button.Label)
+                .WithLabel(HttpUtility.HtmlDecode(button.Label))
                 .WithCustomId(button.CustomId)
                 .WithStyle(button.CustomId == _correctAnswerId ? ButtonStyle.Success : ButtonStyle.Danger)
                 .WithDisabled(true);
@@ -67,7 +68,7 @@ public class TriviaEmbed : Handler, IMessageInteractable
     private Embed CreateEmbed()
     {
         return new EmbedBuilder()
-            .WithTitle(_question.Question)
+            .WithTitle(HttpUtility.HtmlDecode(_question.Question))
             .AddField("Difficulty", _question.Difficulty)
             .AddField("Category", _question.Category)
             .Build();
@@ -83,7 +84,8 @@ public class TriviaEmbed : Handler, IMessageInteractable
         options.Add(_question.CorrectAnswer);
 
         foreach (var buttonComponent in options.OrderBy(x => r.Next()).Select(o => new ButtonBuilder()
-                     .WithLabel(o).WithStyle(ButtonStyle.Primary).WithCustomId(Guid.NewGuid().ToString()).Build()))
+                     .WithLabel(HttpUtility.HtmlDecode(o)).WithStyle(ButtonStyle.Primary)
+                     .WithCustomId(Guid.NewGuid().ToString()).Build()))
         {
             rowBuilder.AddComponent(buttonComponent);
 
