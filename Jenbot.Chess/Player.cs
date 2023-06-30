@@ -4,12 +4,10 @@ public class Player
 {
     public Profile Profile { get; }
     public Stats Stats { get; }
-    public bool CurrentlyOnline { get; }
 
-    public Player(Profile profile, Stats stats, bool currentlyOnline)
+    public Player(Profile profile, Stats stats)
     {
         Profile = profile;
-        Stats = stats;
-        CurrentlyOnline = currentlyOnline;
+        Stats = stats; 
     }
 }

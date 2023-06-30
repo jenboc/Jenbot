@@ -50,7 +50,7 @@ public class Profile
     public string? TwitchUrl { get; }
     
     [JsonProperty("fide")]
-    public string? FideRating { get; }
+    public int FideRating { get; }
 
     [JsonProperty("verified")]
     public bool IsVerified { get; }

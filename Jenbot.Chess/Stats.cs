@@ -18,4 +18,13 @@ public class Stats
     
     [JsonProperty("chess960_daily")]
     public GameType? Daily960Chess { get; }
+
+    [JsonProperty("tactics")] 
+    public LessonData? Tactics { get; }
+    
+    [JsonProperty("lessons")]
+    public LessonData? Lessons { get; }
+    
+    [JsonProperty("puzzle_rush")]
+    public PuzzleRushData? PuzzleRush { get; }
 }

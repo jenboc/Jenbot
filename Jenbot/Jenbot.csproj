@@ -21,6 +21,7 @@
     </ItemGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\Jenbot.Chess\Jenbot.Chess.csproj" />
       <ProjectReference Include="..\Jenbot.Trivia\Jenbot.Trivia.csproj" />
     </ItemGroup>
 
