@@ -7,15 +7,16 @@ namespace Jenbot.Commands;
 
 public class Trivia : ICommand
 {
-    public string Name { get; }
-    private TriviaApi _api;     
-    
+    private readonly TriviaApi _api;
+
     public Trivia()
     {
         Name = "trivia";
         _api = new TriviaApi();
     }
-    
+
+    public string Name { get; }
+
     public async Task Execute(SocketSlashCommand command)
     {
         var question = await _api.GetQuestion();
@@ -34,7 +35,10 @@ public class Trivia : ICommand
         await command.DeleteOriginalResponseAsync();
     }
 
-    public SlashCommandBuilder GetCommandBuilder() => new SlashCommandBuilder()
-        .WithName(Name)
-        .WithDescription("Answer a Trivia Question");
+    public SlashCommandBuilder GetCommandBuilder()
+    {
+        return new SlashCommandBuilder()
+            .WithName(Name)
+            .WithDescription("Answer a Trivia Question");
+    }
 }

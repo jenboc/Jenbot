@@ -1,5 +1,3 @@
-using System.Collections.Immutable;
-using System.ComponentModel;
 using Discord;
 using Discord.WebSocket;
 
@@ -7,13 +5,13 @@ namespace Jenbot.Commands;
 
 public class CreateEvent : ICommand
 {
-    public string Name { get; }
-
     public CreateEvent()
     {
         Name = "create-event";
     }
-    
+
+    public string Name { get; }
+
     public async Task Execute(SocketSlashCommand command)
     {
         var options = new CommandOptions(command);
@@ -21,8 +19,8 @@ public class CreateEvent : ICommand
         var eventType = ParseEventType(options.Channel, options.PhysicalLocation, options.EndDate, options.EndTime);
 
         if (eventType == GuildScheduledEventType.External && options.EndTime != null)
-            options.EndDate ??= options.StartDate; 
-        
+            options.EndDate ??= options.StartDate;
+
         var startDate = ParseDateTime(options.StartDate, options.StartTime);
         var endDate = ParseDateTime(options.EndDate, options.EndTime);
 
@@ -43,80 +41,11 @@ public class CreateEvent : ICommand
                 eventType, description: options.Description, endTime: ParseDateTime(options.EndDate, options.EndTime),
                 channelId: options.Channel?.Id, location: options.PhysicalLocation);
 
-            await command.RespondAsync("Event created successfully"); 
+            await command.RespondAsync("Event created successfully");
         }
         catch
         {
             await command.RespondAsync("There was a problem trying to create that event");
-        }
-    }
-    
-    private DateTimeOffset? ParseDateTime(string? date, string? time)
-    {
-        date ??= DateTime.Now.ToString("dd/MM/yyyy");
-        
-        var splitTime = time?.Split(":").Select(int.Parse).ToArray();
-        var splitDate = date?.Split("/").Select(int.Parse).ToArray();
-
-        if (splitTime == null || splitDate == null || splitTime.Length != 2 || splitDate.Length != 3)
-            return null;
-
-        var dateTime = new DateTime(splitDate[2], splitDate[1], splitDate[0], splitTime[0],
-            splitTime[1], 0);
-
-        if (dateTime < DateTime.Now) 
-            return null;
-
-        return new DateTimeOffset(dateTime);
-    }
-    
-    private GuildScheduledEventType ParseEventType(IGuildChannel? channel, string? physicalLocation, 
-        string? endDate, string? endTime)
-    {
-        // Voice if voice channel provided
-        // External required physical location and end datetime 
-        // Otherwise, None event type
-
-        if (channel is IVoiceChannel)
-            return GuildScheduledEventType.Voice;
-
-        if (physicalLocation != null && endTime != null)
-            return GuildScheduledEventType.External;
-
-        return GuildScheduledEventType.None;
-    }
-    
-    private bool DateIsValid(string dateInput)
-    {
-        var split = dateInput.Split("/");
-        var currentYear = DateTime.Now.Year; 
-        
-        if (split.Length != 3)
-            return false;
-
-        try
-        {
-            var datetime = new DateTime(int.Parse(split[2]), int.Parse(split[1]), int.Parse(split[0]));
-            return datetime < DateTime.Now;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    private bool TimeIsValid(string timeInput)
-    {
-        var split = timeInput.Split(":");
-
-        try
-        {
-            return split.Length == 2 && (int.Parse(split[0]) >= 0 && int.Parse(split[0]) < 24)
-                                     && (int.Parse(split[1]) >= 0 && int.Parse(split[1]) < 60);
-        }
-        catch
-        {
-            return false;
         }
     }
 
@@ -141,7 +70,7 @@ public class CreateEvent : ICommand
             .WithDescription("Description of the event")
             .WithRequired(false)
             .WithType(ApplicationCommandOptionType.String);
-        
+
         var channel = new SlashCommandOptionBuilder().WithName("channel")
             .WithDescription("Channel where the event will take place (if applicable)")
             .WithRequired(false)
@@ -151,7 +80,7 @@ public class CreateEvent : ICommand
             .WithDescription("Physical location where the event will take place (if applicable)")
             .WithRequired(false)
             .WithType(ApplicationCommandOptionType.String);
-        
+
         var endDate = new SlashCommandOptionBuilder().WithName("end-date")
             .WithDescription("End date of the event (DD/MM/YYYY)")
             .WithRequired(false)
@@ -161,7 +90,7 @@ public class CreateEvent : ICommand
             .WithDescription("End time of the event (24hr format)")
             .WithRequired(false)
             .WithType(ApplicationCommandOptionType.String);
-        
+
         // TODO: Add cover image
 
         return new SlashCommandBuilder().WithName(Name)
@@ -175,22 +104,90 @@ public class CreateEvent : ICommand
             .AddOption(endDate)
             .AddOption(endTime);
     }
-    
+
+    private DateTimeOffset? ParseDateTime(string? date, string? time)
+    {
+        date ??= DateTime.Now.ToString("dd/MM/yyyy");
+
+        var splitTime = time?.Split(":").Select(int.Parse).ToArray();
+        var splitDate = date?.Split("/").Select(int.Parse).ToArray();
+
+        if (splitTime == null || splitDate == null || splitTime.Length != 2 || splitDate.Length != 3)
+            return null;
+
+        var dateTime = new DateTime(splitDate[2], splitDate[1], splitDate[0], splitTime[0],
+            splitTime[1], 0);
+
+        if (dateTime < DateTime.Now)
+            return null;
+
+        return new DateTimeOffset(dateTime);
+    }
+
+    private GuildScheduledEventType ParseEventType(IGuildChannel? channel, string? physicalLocation,
+        string? endDate, string? endTime)
+    {
+        // Voice if voice channel provided
+        // External required physical location and end datetime 
+        // Otherwise, None event type
+
+        if (channel is IVoiceChannel)
+            return GuildScheduledEventType.Voice;
+
+        if (physicalLocation != null && endTime != null)
+            return GuildScheduledEventType.External;
+
+        return GuildScheduledEventType.None;
+    }
+
+    private bool DateIsValid(string dateInput)
+    {
+        var split = dateInput.Split("/");
+        var currentYear = DateTime.Now.Year;
+
+        if (split.Length != 3)
+            return false;
+
+        try
+        {
+            var datetime = new DateTime(int.Parse(split[2]), int.Parse(split[1]), int.Parse(split[0]));
+            return datetime < DateTime.Now;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private bool TimeIsValid(string timeInput)
+    {
+        var split = timeInput.Split(":");
+
+        try
+        {
+            return split.Length == 2 && int.Parse(split[0]) >= 0 && int.Parse(split[0]) < 24
+                   && int.Parse(split[1]) >= 0 && int.Parse(split[1]) < 60;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private struct CommandOptions
     {
-        public string EventName { get; set; }
-        public string? StartDate { get; set; }
-        public string StartTime { get; set; }
+        public string EventName { get; }
+        public string? StartDate { get; }
+        public string StartTime { get; }
         public string? EndDate { get; set; }
-        public string? EndTime { get; set; }
-        public string? Description { get; set; }
-        public IGuildChannel? Channel { get; set; }
-        public string? PhysicalLocation { get; set; }
+        public string? EndTime { get; }
+        public string? Description { get; }
+        public IGuildChannel? Channel { get; }
+        public string? PhysicalLocation { get; }
 
         public CommandOptions(SocketSlashCommand command)
         {
             foreach (var option in command.Data.Options)
-            {
                 switch (option.Name)
                 {
                     case "event-name":
@@ -218,7 +215,6 @@ public class CreateEvent : ICommand
                         EndTime = (string)option.Value;
                         break;
                 }
-            }
         }
     }
 }

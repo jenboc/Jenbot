@@ -7,7 +7,7 @@ public interface ICommand
 {
     // Name used to identify the command 
     public string Name { get; }
-    
+
     // What the command should do when executed
     public Task Execute(SocketSlashCommand command);
 

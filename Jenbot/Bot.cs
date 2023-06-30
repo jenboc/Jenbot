@@ -6,10 +6,9 @@ namespace Jenbot;
 
 public class Bot
 {
+    private const string CONFIG_FILE = "appsettings.json";
     private readonly DiscordSocketClient _client;
     private readonly BotConfig _config;
-    
-    private const string CONFIG_FILE = "appsettings.json";
 
     public Bot()
     {
@@ -23,22 +22,23 @@ public class Bot
         var configFile = new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddJsonFile(CONFIG_FILE).Build();
-        _config = configFile.GetSection("BotConfig").Get<BotConfig>() 
+        _config = configFile.GetSection("BotConfig").Get<BotConfig>()
                   ?? throw new Exception($"Error loading {CONFIG_FILE} for Bot Configuration");
     }
 
     public async Task Start()
     {
         await _client.LoginAsync(TokenType.Bot, _config.Token);
-        await _client.StartAsync(); 
-        
+        await _client.StartAsync();
+
         // Delay task until program closed
         await Task.Delay(-1);
     }
 
     private async Task Ready()
     {
-        await _client.BulkOverwriteGlobalApplicationCommandsAsync(InteractionManager.PrepCommandsForOverwrite().ToArray());
+        await _client.BulkOverwriteGlobalApplicationCommandsAsync(InteractionManager.PrepCommandsForOverwrite()
+            .ToArray());
     }
 
     private Task Log(LogMessage message)

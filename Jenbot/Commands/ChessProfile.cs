@@ -6,16 +6,16 @@ namespace Jenbot.Commands;
 
 public class ChessProfile : ICommand
 {
-    public string Name { get; }
-
-    private ChessApi _api; 
+    private readonly ChessApi _api;
 
     public ChessProfile()
     {
         Name = "chess-profile";
         _api = new ChessApi();
     }
-    
+
+    public string Name { get; }
+
     public async Task Execute(SocketSlashCommand command)
     {
         var name = (string)command.Data.Options.First();
@@ -34,19 +34,32 @@ public class ChessProfile : ICommand
         }
     }
 
+    public SlashCommandBuilder GetCommandBuilder()
+    {
+        return new SlashCommandBuilder()
+            .WithName(Name)
+            .WithDescription("Lookup someone's user data on chess.com")
+            .AddOption(new SlashCommandOptionBuilder()
+                .WithName("username")
+                .WithDescription("Their chess.com username")
+                .WithRequired(true)
+                .WithType(ApplicationCommandOptionType.String)
+            );
+    }
+
     private void AddGameTypeFields(GameType? typeData, string typeName, EmbedBuilder builder)
     {
         if (typeData != null)
         {
-            builder.AddField($"{typeName} Rating:", typeData.LastGame.Rating, false);
+            builder.AddField($"{typeName} Rating:", typeData.LastGame.Rating);
             if (typeData.BestGame != null)
-                builder.AddField($"Best {typeName} Game:", typeData.BestGame.GameUrl, false);
+                builder.AddField($"Best {typeName} Game:", typeData.BestGame.GameUrl);
         }
     }
-    
+
     private Embed CreatePlayerEmbed(Player player)
     {
-        var r = new Random(); 
+        var r = new Random();
         var builder = new EmbedBuilder()
             .WithTitle($"{player.Profile.Title} {player.Profile.Username}")
             .WithUrl(player.Profile.Url)
@@ -76,14 +89,4 @@ public class ChessProfile : ICommand
 
         return dateTime.ToString("dd/MM/yy");
     }
-
-    public SlashCommandBuilder GetCommandBuilder() => new SlashCommandBuilder()
-        .WithName(Name)
-        .WithDescription("Lookup someone's user data on chess.com")
-        .AddOption(new SlashCommandOptionBuilder()
-            .WithName("username")
-            .WithDescription("Their chess.com username")
-            .WithRequired(true)
-            .WithType(ApplicationCommandOptionType.String)
-        );
 }
