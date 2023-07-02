@@ -40,12 +40,13 @@ public class InspirationalQuote : ICommand
         {
             var textOptions = new TextOptions(font)
             {
-                WrappingLength = img.Width - 2 * padding
+                WrappingLength = img.Width - 2 * padding,
+                HorizontalAlignment = HorizontalAlignment.Center
             };
 
             var drawingOptions = new DrawingOptions()
             {
-                Transform = Matrix3x2.CreateTranslation(padding, padding)
+                Transform = Matrix3x2.CreateTranslation(img.Width / 2f, padding)
             };
             
             img.Mutate(i => 
