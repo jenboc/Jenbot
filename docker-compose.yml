@@ -1,18 +1,8 @@
 version: '3.7'
 
-networks:
-  net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.71.0/16
-
 services:
   jenbot:
     build: .
     image: jenboc/jenbot
     container_name: jenbot
-    networks:
-      net:
-        ipv4_address: 172.20.71.5
     restart: unless-stopped
