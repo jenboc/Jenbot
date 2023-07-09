@@ -13,8 +13,8 @@ public class InspirationalQuote : ICommand
 {
     public string Name { get; }
 
-    private const string DEFAULT_FONT = @"Resources\Fonts\DancingScript.ttf";
-    private const string DEFAULT_BACKGROUND = @"Resources\Images\inspirational1.jpeg";
+    private const string DEFAULT_FONT = @"Resources/Fonts/DancingScript.ttf";
+    private const string DEFAULT_BACKGROUND = @"Resources/Images/inspirational1.jpeg";
     private const int DEFAULT_PADDING = 10;
     private static readonly Color _defaultColour = Color.Black;
     
