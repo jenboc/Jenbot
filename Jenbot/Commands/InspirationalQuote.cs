@@ -13,7 +13,7 @@ public class InspirationalQuote : ICommand
 {
     public string Name { get; }
 
-    private const string DEFAULT_FONT = @"Resources\Fonts\cursive.ttf";
+    private const string DEFAULT_FONT = @"Resources\Fonts\DancingScript.ttf";
     private const string DEFAULT_BACKGROUND = @"Resources\Images\inspirational1.jpeg";
     private const int DEFAULT_PADDING = 10;
     private static readonly Color _defaultColour = Color.Black;
@@ -32,7 +32,7 @@ public class InspirationalQuote : ICommand
     {
         var options = new CommandOptions(command.Data.Options);
         
-        var font = new Font(_defaultFontFamily, 50);
+        var font = new Font(_defaultFontFamily, 100);
         var imagePath = DEFAULT_BACKGROUND; 
         var padding = DEFAULT_PADDING;
         var filepath = $"{Guid.NewGuid()}.jpeg";
