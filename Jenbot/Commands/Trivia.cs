@@ -7,15 +7,9 @@ namespace Jenbot.Commands;
 
 public class Trivia : ICommand
 {
-    private readonly TriviaApi _api;
+    private readonly TriviaApi _api = new();
 
-    public Trivia()
-    {
-        Name = "trivia";
-        _api = new TriviaApi();
-    }
-
-    public string Name { get; }
+    public string Name => "trivia";
 
     public async Task Execute(SocketSlashCommand command)
     {

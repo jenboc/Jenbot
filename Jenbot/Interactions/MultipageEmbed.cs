@@ -8,12 +8,29 @@ public class MultipageEmbed : Handler, IMessageInteractable
     public MultipageEmbed(Dictionary<string, string> pages, string startingPage)
     {
         MenuId = Guid.NewGuid().ToString();
-        Pages = pages;
+        
+        var embedPages = new Dictionary<string, Embed>();
+
+        foreach (var key in pages.Keys)
+        {
+            var pageData = pages[key];
+            embedPages.Add(key, BuildEmbed(key, pageData));
+        }
+
+        Pages = embedPages;
+        CurrentEmbed = Pages[startingPage];
         MsgComponent = BuildComponent(startingPage);
-        CurrentEmbed = BuildEmbed(startingPage);
     }
 
-    private Dictionary<string, string> Pages { get; }
+    public MultipageEmbed(Dictionary<string, Embed> pages, string startingPage)
+    {
+        MenuId = Guid.NewGuid().ToString();
+        Pages = pages;
+        CurrentEmbed = pages[startingPage];
+        MsgComponent = BuildComponent(startingPage);
+    }
+
+    private Dictionary<string, Embed> Pages { get; }
     private Embed CurrentEmbed { get; set; }
 
     private string MenuId { get; }
@@ -39,10 +56,10 @@ public class MultipageEmbed : Handler, IMessageInteractable
         return builder.WithSelectMenu(menu).Build();
     }
 
-    private Embed BuildEmbed(string key)
+    private Embed BuildEmbed(string title, string data)
     {
-        return new EmbedBuilder().WithTitle(key)
-            .WithDescription(Pages[key]).Build();
+        return new EmbedBuilder().WithTitle(title)
+            .WithDescription(data).Build();
     }
 
     private void EditMessage(MessageProperties properties)
@@ -54,7 +71,7 @@ public class MultipageEmbed : Handler, IMessageInteractable
     public override async Task HandleInteraction(SocketMessageComponent component)
     {
         var selected = string.Join("", component.Data.Values);
-        CurrentEmbed = BuildEmbed(selected);
+        CurrentEmbed = Pages[selected];
         MsgComponent = BuildComponent(selected);
 
         await component.Message.ModifyAsync(EditMessage);

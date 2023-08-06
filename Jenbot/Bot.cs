@@ -10,6 +10,8 @@ public class Bot
     private readonly DiscordSocketClient _client;
     private readonly BotConfig _config;
 
+    public static readonly Random Random = new Random();
+    
     public Bot()
     {
         _client = new DiscordSocketClient();

@@ -7,15 +7,9 @@ namespace Jenbot.Commands;
 
 public class ChessProfile : ICommand
 {
-    private readonly ChessApi _api;
+    private readonly ChessApi _api = new();
 
-    public ChessProfile()
-    {
-        Name = "chess-profile";
-        _api = new ChessApi();
-    }
-
-    public string Name { get; }
+    public string Name => "chess-profile";
 
     public async Task Execute(SocketSlashCommand command)
     {
