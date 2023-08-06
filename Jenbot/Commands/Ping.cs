@@ -5,12 +5,7 @@ namespace Jenbot.Commands;
 
 public class Ping : ICommand
 {
-    public Ping()
-    {
-        Name = "ping";
-    }
-
-    public string Name { get; }
+    public string Name => "ping";
 
     public async Task Execute(SocketSlashCommand command)
     {

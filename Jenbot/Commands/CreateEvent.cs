@@ -5,12 +5,7 @@ namespace Jenbot.Commands;
 
 public class CreateEvent : ICommand
 {
-    public CreateEvent()
-    {
-        Name = "create-event";
-    }
-
-    public string Name { get; }
+    public string Name => "create-event";
 
     public async Task Execute(SocketSlashCommand command)
     {
