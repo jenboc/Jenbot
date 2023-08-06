@@ -22,5 +22,6 @@ public class DieRoll : ICommand
             new SlashCommandOptionBuilder()
                 .WithName("sides")
                 .WithDescription("Number of sides on the die")
-                .WithType(ApplicationCommandOptionType.Integer));
+                .WithType(ApplicationCommandOptionType.Integer)
+                .WithRequired(true));
 }
