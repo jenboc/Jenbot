@@ -13,12 +13,14 @@ public class ChessProfile : ICommand
 
     public async Task Execute(SocketSlashCommand command)
     {
+        await command.DeferAsync();
+        
         var name = (string)command.Data.Options.First();
         var playerData = await _api.GetPlayerAsync(name);
 
         if (playerData == null || string.IsNullOrEmpty(playerData.Profile.Username))
         {
-            await command.RespondAsync($"{command.User.Mention}, that user does not exist");
+            await command.FollowupAsync($"{command.User.Mention}, that user does not exist");
             return;
         }
 
@@ -26,11 +28,11 @@ public class ChessProfile : ICommand
         {
             var embed = CreatePlayerEmbed(playerData);
 
-            await command.RespondAsync(embed: embed);
+            await command.FollowupAsync(embed: embed);
         }
         catch (Exception e)
         {
-            await command.RespondAsync($"There was a problem processing your request, {command.User.Mention}");
+            await command.FollowupAsync($"There was a problem processing your request, {command.User.Mention}");
             Console.WriteLine(e);
         }
     }

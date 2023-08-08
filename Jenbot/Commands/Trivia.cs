@@ -13,6 +13,8 @@ public class Trivia : ICommand
 
     public async Task Execute(SocketSlashCommand command)
     {
+        await command.DeferAsync(); 
+        
         var question = await _api.GetQuestion();
 
         if (question == null)
@@ -23,10 +25,8 @@ public class Trivia : ICommand
 
         var questionEmbed = new TriviaEmbed(question);
         InteractionManager.AddHandler(questionEmbed);
-
-        await command.DeferAsync();
-        await questionEmbed.Send(command.Channel);
-        await command.DeleteOriginalResponseAsync();
+        
+        await questionEmbed.Followup(command);
     }
 
     public SlashCommandBuilder GetCommandBuilder()

@@ -32,6 +32,11 @@ public class TriviaEmbed : Handler, IMessageInteractable
         _message = await channel.SendMessageAsync(embed: Embed, components: MsgComponent);
     }
 
+    public async Task Followup(SocketInteraction interaction)
+    {
+        _message = await interaction.FollowupAsync(embed: Embed, components: MsgComponent);
+    }
+
     public override async Task HandleInteraction(SocketMessageComponent component)
     {
         RecolourButtons();
