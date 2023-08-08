@@ -17,7 +17,7 @@ public class Bot
         _client = new DiscordSocketClient();
         _client.Log += Log;
         _client.Ready += Ready;
-        _client.SlashCommandExecuted += InteractionManager.HandleSlashCommand;
+        _client.SlashCommandExecuted += SlashCommandExecuted;
         _client.ButtonExecuted += InteractionManager.HandleComponents;
         _client.SelectMenuExecuted += InteractionManager.HandleComponents;
 
@@ -26,6 +26,14 @@ public class Bot
             .AddJsonFile(CONFIG_FILE).Build();
         _config = configFile.GetSection("BotConfig").Get<BotConfig>()
                   ?? throw new Exception($"Error loading {CONFIG_FILE} for Bot Configuration");
+    }
+
+    private async Task SlashCommandExecuted(SocketSlashCommand slashCommand)
+    {
+        _ = Task.Run(async () =>
+        {
+            await InteractionManager.HandleSlashCommand(slashCommand);
+        });
     }
 
     public async Task Start()
