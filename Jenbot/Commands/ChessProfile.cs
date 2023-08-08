@@ -16,6 +16,12 @@ public class ChessProfile : ICommand
         var name = (string)command.Data.Options.First();
         var playerData = await _api.GetPlayerAsync(name);
 
+        if (playerData == null || string.IsNullOrEmpty(playerData.Profile.Username))
+        {
+            await command.RespondAsync($"{command.User.Mention}, that user does not exist");
+            return;
+        }
+
         try
         {
             var embed = CreatePlayerEmbed(playerData);
@@ -66,7 +72,9 @@ public class ChessProfile : ICommand
 
         builder.AddField("Last Online:", GetStringDate(player.Profile.LastOnlineTimestamp), true);
         builder.AddField("Registration Date:", GetStringDate(player.Profile.RegistrationTimestamp), true);
-        builder.AddField("League:", player.Profile.League, true);
+        
+        if (player.Profile.League != null)
+            builder.AddField("League:", player.Profile.League, true);
 
         AddGameTypeFields(player.Stats.RapidChess, "Rapid", builder);
         AddGameTypeFields(player.Stats.BlitzChess, "Blitz", builder);

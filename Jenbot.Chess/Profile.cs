@@ -38,5 +38,5 @@ public class Profile
 
     [JsonProperty("verified")] public bool IsVerified { get; private set; }
 
-    [JsonProperty("league")] public string League { get; private set; }
+    [JsonProperty("league")] public string? League { get; private set; }
 }
