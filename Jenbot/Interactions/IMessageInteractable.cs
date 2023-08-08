@@ -6,4 +6,5 @@ public interface IMessageInteractable
 {
     public Task Reply(SocketInteraction interaction);
     public Task Send(ISocketMessageChannel channel);
+    public Task Followup(SocketInteraction interaction);
 }

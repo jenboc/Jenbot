@@ -30,6 +30,8 @@ public class InspirationalQuote : ICommand
 
     public async Task Execute(SocketSlashCommand command)
     {
+        await command.DeferAsync(); 
+        
         var options = new CommandOptions(command.Data.Options);
         
         var font = new Font(_defaultFontFamily, 100);
@@ -55,7 +57,7 @@ public class InspirationalQuote : ICommand
             await img.SaveAsync(filepath);
         }
 
-        await command.RespondWithFileAsync(filepath);
+        await command.FollowupWithFileAsync(filepath);
         File.Delete(filepath);
     }
 

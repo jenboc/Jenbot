@@ -45,6 +45,11 @@ public class MultipageEmbed : Handler, IMessageInteractable
         await channel.SendMessageAsync(embed: CurrentEmbed, components: MsgComponent);
     }
 
+    public async Task Followup(SocketInteraction interaction)
+    {
+        await interaction.FollowupAsync(embed: CurrentEmbed, components: MsgComponent);
+    }
+
     private MessageComponent BuildComponent(string selected)
     {
         var builder = new ComponentBuilder();
