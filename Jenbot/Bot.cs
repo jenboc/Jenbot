@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
+using Jenbot.Interactions;
 
 namespace Jenbot;
 

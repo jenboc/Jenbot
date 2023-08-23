@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Jenbot.Interactions;
 using JishoNET;
 using JishoNET.Models;
 using Color = Discord.Color;

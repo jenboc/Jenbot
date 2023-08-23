@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Jenbot.Chess;
+using Jenbot.Interactions;
 using Color = Discord.Color;
 
 namespace Jenbot.Commands;

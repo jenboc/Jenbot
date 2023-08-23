@@ -1,10 +1,8 @@
 ﻿using System.Reflection;
 using Discord;
 using Discord.WebSocket;
-using Jenbot.Commands;
-using Jenbot.Interactions;
 
-namespace Jenbot;
+namespace Jenbot.Interactions;
 
 public static class InteractionManager
 {
