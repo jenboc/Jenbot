@@ -29,7 +29,7 @@ public static class InteractionManager
     /// <returns>IEnumerable containing every implementation of ICommand</returns>
     private static IEnumerable<ICommand> LoadCommands()
     {
-        return from t in Assembly.GetExecutingAssembly().GetTypes()
+        return from t in Assembly.GetEntryAssembly()?.GetTypes()
             where t.GetInterfaces().Contains(typeof(ICommand))
                   && t.GetConstructor(Type.EmptyTypes) != null
             select Activator.CreateInstance(t) as ICommand;
