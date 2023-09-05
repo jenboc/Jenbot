@@ -55,8 +55,19 @@ public static class InteractionManager
         {
             if (command.Name != slashCommand.Data.Name)
                 continue;
+            
+            Console.WriteLine($"Executing /{command.Name}");
 
-            await command.Execute(slashCommand);
+            try
+            {
+                await command.Execute(slashCommand);
+                Console.WriteLine($"/{command.Name} executed");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error executing /{command.Name}\n{e}");
+            }
+
             return;
         }
 
