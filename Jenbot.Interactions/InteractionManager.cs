@@ -49,6 +49,8 @@ public static class InteractionManager
     /// </summary>
     public static async Task HandleSlashCommand(SocketSlashCommand slashCommand)
     {
+        Console.WriteLine($"Received /{slashCommand.Data.Name}");
+        
         foreach (var command in _commands)
         {
             if (command.Name != slashCommand.Data.Name)
