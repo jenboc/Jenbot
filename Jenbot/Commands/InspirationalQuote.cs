@@ -1,6 +1,7 @@
 using System.Numerics;
 using Discord;
 using Discord.WebSocket;
+using Jenbot.Interactions;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp.ColorSpaces;
 using SixLabors.ImageSharp.Drawing.Processing;

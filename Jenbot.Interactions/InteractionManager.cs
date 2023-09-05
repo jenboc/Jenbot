@@ -1,10 +1,8 @@
 ﻿using System.Reflection;
 using Discord;
 using Discord.WebSocket;
-using Jenbot.Commands;
-using Jenbot.Interactions;
 
-namespace Jenbot;
+namespace Jenbot.Interactions;
 
 public static class InteractionManager
 {
@@ -51,6 +49,8 @@ public static class InteractionManager
     /// </summary>
     public static async Task HandleSlashCommand(SocketSlashCommand slashCommand)
     {
+        Console.WriteLine($"Received /{slashCommand.Data.Name}");
+        
         foreach (var command in _commands)
         {
             if (command.Name != slashCommand.Data.Name)

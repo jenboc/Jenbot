@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-namespace Jenbot.Commands;
+namespace Jenbot.Interactions;
 
 public interface ICommand
 {
