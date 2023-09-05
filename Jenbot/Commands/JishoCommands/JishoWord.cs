@@ -20,7 +20,7 @@ public class JishoWord : ICommand
 
         if (result == null || !result.Success || result.Data.Length == 0)
         {
-            await command.RespondAsync($"{command.User.Mention}, {word} was not found. Please check that you " +
+            await command.FollowupAsync($"{command.User.Mention}, {word} was not found. Please check that you " +
                                        $"have spelt the word correctly and then try again.");
             return;
         }
@@ -28,7 +28,7 @@ public class JishoWord : ICommand
         if (result.Data.Length == 1)
         {
             var embed = BuildDefinitionEmbed(result.Data[0]);
-            await command.RespondAsync(embed: embed);
+            await command.FollowupAsync(embed: embed);
             return;
         }
         
@@ -43,7 +43,7 @@ public class JishoWord : ICommand
         
         var multipage = new MultipageEmbed(multipageDict, multipageDict.Keys.First());
         InteractionManager.AddHandler(multipage);
-        await multipage.Reply(command);
+        await multipage.Followup(command);
     }
 
     private static Embed BuildDefinitionEmbed(JishoDefinition def)

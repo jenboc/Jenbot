@@ -10,7 +10,7 @@ public class Ping : ICommand
 
     public async Task Execute(SocketSlashCommand command)
     {
-        await command.RespondAsync("pong!");
+        await command.FollowupAsync("pong!");
     }
 
     public SlashCommandBuilder GetCommandBuilder()

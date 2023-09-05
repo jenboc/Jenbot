@@ -13,7 +13,7 @@ public class DieRoll : ICommand
         var numSides = Convert.ToInt32(command.Data.Options.First().Value);
         var result = Bot.Random.Next(1, numSides + 1);
 
-        await command.RespondAsync($"{command.User.Mention}, you rolled a {result} with your D{numSides}");
+        await command.FollowupAsync($"{command.User.Mention}, you rolled a {result} with your D{numSides}");
     }
 
     public SlashCommandBuilder GetCommandBuilder() => new SlashCommandBuilder()

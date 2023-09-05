@@ -10,7 +10,7 @@ public class Games : ICommand
     
     public string Name => "games";
 
-    public async Task Execute(SocketSlashCommand command) => await command.RespondAsync(ITCH_URL);
+    public async Task Execute(SocketSlashCommand command) => await command.FollowupAsync(ITCH_URL);
 
     public SlashCommandBuilder GetCommandBuilder() => new SlashCommandBuilder()
         .WithName(Name)

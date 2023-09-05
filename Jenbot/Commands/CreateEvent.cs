@@ -23,7 +23,7 @@ public class CreateEvent : ICommand
         if (startDate == null ||
             ((endDate == null || endDate < startDate) && eventType == GuildScheduledEventType.External))
         {
-            await command.RespondAsync($"{command.User.Mention}, please ensure that dates and times are entered " +
+            await command.FollowupAsync($"{command.User.Mention}, please ensure that dates and times are entered " +
                                        $"in the correct format; and that if it is a physical event, you provide a end" +
                                        $" date and time");
             return;
@@ -37,11 +37,11 @@ public class CreateEvent : ICommand
                 eventType, description: options.Description, endTime: ParseDateTime(options.EndDate, options.EndTime),
                 channelId: options.Channel?.Id, location: options.PhysicalLocation);
 
-            await command.RespondAsync("Event created successfully");
+            await command.FollowupAsync("Event created successfully");
         }
         catch
         {
-            await command.RespondAsync("There was a problem trying to create that event");
+            await command.FollowupAsync("There was a problem trying to create that event");
         }
     }
 

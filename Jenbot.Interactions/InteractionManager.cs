@@ -50,6 +50,7 @@ public static class InteractionManager
     public static async Task HandleSlashCommand(SocketSlashCommand slashCommand)
     {
         Console.WriteLine($"Received /{slashCommand.Data.Name}");
+        await slashCommand.DeferAsync();
         
         foreach (var command in _commands)
         {
@@ -71,7 +72,7 @@ public static class InteractionManager
             return;
         }
 
-        await slashCommand.RespondAsync($"{slashCommand.User.Mention} {slashCommand.Data.Name} does not exist!");
+        await slashCommand.FollowupAsync($"{slashCommand.User.Mention} {slashCommand.Data.Name} does not exist!");
     }
 
     /// <summary>

@@ -18,7 +18,7 @@ public class JishoKanji : ICommand
 
         if (kanji.Length > 1)
         {
-            await command.RespondAsync($"{command.User.Mention}, please only search for individual characters. " +
+            await command.FollowupAsync($"{command.User.Mention}, please only search for individual characters. " +
                                        $"Please use the jisho-word command to search for words.");
             return;
         }
@@ -27,14 +27,14 @@ public class JishoKanji : ICommand
         
         if (result == null || !result.Success)
         {
-            await command.RespondAsync($"{command.User.Mention}, {kanji} was not found. Please check that you " +
+            await command.FollowupAsync($"{command.User.Mention}, {kanji} was not found. Please check that you " +
                                        $"have entered the kanji character you want to search for, not one of " +
                                        $"its readings");
             return;
         }
 
         var embed = BuildDefinitionEmbed(result.Data);
-        await command.RespondAsync(embed: embed);
+        await command.FollowupAsync(embed: embed);
     }
 
     private static Embed BuildDefinitionEmbed(JishoKanjiDefinition def)

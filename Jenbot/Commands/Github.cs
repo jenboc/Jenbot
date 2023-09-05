@@ -10,7 +10,7 @@ public class Github : ICommand
     
     public string Name => "github";
 
-    public async Task Execute(SocketSlashCommand command) => await command.RespondAsync(REPO_URL);
+    public async Task Execute(SocketSlashCommand command) => await command.FollowupAsync(REPO_URL);
 
     public SlashCommandBuilder GetCommandBuilder() => new SlashCommandBuilder()
         .WithName(Name)

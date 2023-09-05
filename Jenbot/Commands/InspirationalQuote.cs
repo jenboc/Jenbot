@@ -31,8 +31,6 @@ public class InspirationalQuote : ICommand
 
     public async Task Execute(SocketSlashCommand command)
     {
-        await command.DeferAsync(); 
-        
         var options = new CommandOptions(command.Data.Options);
         
         var font = new Font(_defaultFontFamily, 100);

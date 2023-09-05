@@ -14,8 +14,6 @@ public class ChessProfile : ICommand
 
     public async Task Execute(SocketSlashCommand command)
     {
-        await command.DeferAsync();
-        
         var name = (string)command.Data.Options.First();
         var playerData = await _api.GetPlayerAsync(name);
 

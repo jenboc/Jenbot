@@ -13,13 +13,11 @@ public class Trivia : ICommand
 
     public async Task Execute(SocketSlashCommand command)
     {
-        await command.DeferAsync(); 
-        
         var question = await _api.GetQuestion();
 
         if (question == null)
         {
-            await command.RespondAsync("There was a problem retrieving the question.");
+            await command.FollowupAsync("There was a problem retrieving the question.");
             return;
         }
 
