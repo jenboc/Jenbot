@@ -15,7 +15,10 @@ public class Bot
     
     public Bot()
     {
-        _client = new DiscordSocketClient();
+        _client = new DiscordSocketClient(new DiscordSocketConfig()
+        {
+            UseInteractionSnowflakeDate = false
+        });
         _client.Log += Log;
         _client.Ready += Ready;
         _client.SlashCommandExecuted += SlashCommandExecuted;
