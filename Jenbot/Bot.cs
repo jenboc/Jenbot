@@ -24,7 +24,7 @@ public class Bot
         _client.SlashCommandExecuted += SlashCommandExecuted;
         _client.ButtonExecuted += InteractionManager.HandleComponents;
         _client.SelectMenuExecuted += InteractionManager.HandleComponents;
-
+        
         var configFile = new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddJsonFile(CONFIG_FILE).Build();
@@ -44,7 +44,7 @@ public class Bot
     {
         await _client.LoginAsync(TokenType.Bot, _config.Token);
         await _client.StartAsync();
-
+        
         // Delay task until program closed
         await Task.Delay(-1);
     }
@@ -53,6 +53,8 @@ public class Bot
     {
         await _client.BulkOverwriteGlobalApplicationCommandsAsync(InteractionManager.PrepCommandsForOverwrite()
             .ToArray());
+        
+        await _client.SetGameAsync("Being Bottastic");
     }
 
     private Task Log(LogMessage message)
