@@ -1,6 +1,6 @@
 ﻿using Discord.WebSocket;
 
-namespace Jenbot.Interactions;
+namespace Jenbot.Interactables;
 
 public interface IMessageInteractable
 {

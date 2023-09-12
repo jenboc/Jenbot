@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jenbot.Trivia", "Jenbot.Tri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jenbot.Chess", "Jenbot.Chess\Jenbot.Chess.csproj", "{8C1FAFE3-ABC1-4A0A-879A-1A548E540967}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jenbot.Interactions", "Jenbot.Interactions\Jenbot.Interactions.csproj", "{E4141465-951A-4BB8-AA65-6743E8E224A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jenbot.Interactables", "Jenbot.Interactables\Jenbot.Interactables.csproj", "{E4141465-951A-4BB8-AA65-6743E8E224A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

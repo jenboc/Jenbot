@@ -30,13 +30,13 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Jenbot.Chess\Jenbot.Chess.csproj" />
-        <ProjectReference Include="..\Jenbot.Interactions\Jenbot.Interactions.csproj" />
+        <ProjectReference Include="..\Jenbot.Interactables\Jenbot.Interactables.csproj" />
         <ProjectReference Include="..\Jenbot.Trivia\Jenbot.Trivia.csproj" />
+
+
     </ItemGroup>
 
 
-    <ItemGroup>
-      <Folder Include="Interactions\" />
-    </ItemGroup>
+
 
 </Project>

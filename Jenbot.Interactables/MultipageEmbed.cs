@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-namespace Jenbot.Interactions;
+namespace Jenbot.Interactables;
 
 public class MultipageEmbed : Handler, IMessageInteractable
 {

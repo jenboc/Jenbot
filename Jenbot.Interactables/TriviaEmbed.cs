@@ -4,7 +4,7 @@ using Discord.Rest;
 using Discord.WebSocket;
 using Jenbot.Trivia;
 
-namespace Jenbot.Interactions;
+namespace Jenbot.Interactables;
 
 public class TriviaEmbed : Handler, IMessageInteractable
 {

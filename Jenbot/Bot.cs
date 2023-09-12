@@ -1,7 +1,9 @@
-﻿using Discord;
+﻿using System.Reflection;
+using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
-using Jenbot.Interactions;
+using Jenbot.Interactables;
 
 namespace Jenbot;
 
@@ -9,6 +11,7 @@ public class Bot
 {
     private const string CONFIG_FILE = "appsettings.json";
     private readonly DiscordSocketClient _client;
+    private readonly InteractionService _interactionService;
     private readonly BotConfig _config;
 
     public static readonly Random Random = new Random();
@@ -19,11 +22,17 @@ public class Bot
         {
             UseInteractionSnowflakeDate = false
         });
+        _interactionService = new InteractionService(_client);
+        
         _client.Log += Log;
         _client.Ready += Ready;
-        _client.SlashCommandExecuted += SlashCommandExecuted;
-        _client.ButtonExecuted += InteractionManager.HandleComponents;
-        _client.SelectMenuExecuted += InteractionManager.HandleComponents;
+        _client.ButtonExecuted += InteractableManager.HandleComponents;
+        _client.SelectMenuExecuted += InteractableManager.HandleComponents;
+        _client.InteractionCreated += async (x) =>
+        {
+            var ctx = new SocketInteractionContext(_client, x);
+            await _interactionService.ExecuteCommandAsync(ctx, null);
+        };
         
         var configFile = new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
@@ -32,16 +41,10 @@ public class Bot
                   ?? throw new Exception($"Error loading {CONFIG_FILE} for Bot Configuration");
     }
 
-    private async Task SlashCommandExecuted(SocketSlashCommand slashCommand)
-    {
-        _ = Task.Run(async () =>
-        {
-            await InteractionManager.HandleSlashCommand(slashCommand);
-        });
-    }
-
     public async Task Start()
     {
+        await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), null);
+        
         await _client.LoginAsync(TokenType.Bot, _config.Token);
         await _client.StartAsync();
         
@@ -51,9 +54,7 @@ public class Bot
 
     private async Task Ready()
     {
-        await _client.BulkOverwriteGlobalApplicationCommandsAsync(InteractionManager.PrepCommandsForOverwrite()
-            .ToArray());
-        
+        await _interactionService.RegisterCommandsGloballyAsync();
         await _client.SetGameAsync("Being Bottastic");
     }
 
