@@ -20,7 +20,8 @@ public class Bot
     {
         _client = new DiscordSocketClient(new DiscordSocketConfig()
         {
-            UseInteractionSnowflakeDate = false
+            UseInteractionSnowflakeDate = false,
+            UseSystemClock = false
         });
         _interactionService = new InteractionService(_client);
         

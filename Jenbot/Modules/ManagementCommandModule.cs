@@ -9,7 +9,9 @@ public class ManagementCommandModule : InteractionModuleBase<SocketInteractionCo
     [SlashCommand("change-status", "Change the bot's discord status")]
     public async Task ChangeStatus(string newStatus)
     {
+        await DeferAsync(ephemeral: true);
         await Context.Client.SetCustomStatusAsync(newStatus);
+        await FollowupAsync("Status changed", ephemeral: true);
     }
     
     [SlashCommand("create-event", "Create an event in the server")]
