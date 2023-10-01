@@ -16,6 +16,7 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0-preview.5.23280.8" />
       <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
       <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta15" />
+      <PackageReference Include="ZXing.Net" Version="0.16.9" />
     </ItemGroup>
 
     <ItemGroup>
