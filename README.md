@@ -1,15 +1,9 @@
 # Jenbot
-My personal discord bot which will have many different uses and quirks. 
-
-This bot is not currently hosted, so therefore if you would like to use it in your own servers you would have to set it
-up yourself.
+My own discord bot written in C# using the DSharpPlus wrapper for the Discord API. 
 
 ## Current Features 
 - Retrieving `chess.com` user statistics
 - Trivia
-- Creating server events
-- Using the [ImageSharp](https://sixlabors.com/products/imagesharp/) library to create an "Inspirational Quote"
- ![quote.jpeg](readme-res/quote.jpeg)
 
 ## Setting up the bot
 1. Go to [Discord's Developer Portal](https://discord.com/developers/applications) and create a new application 

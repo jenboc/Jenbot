@@ -2,11 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jenbot", "Jenbot\Jenbot.csproj", "{9E506DED-E03D-414D-A434-05F31A7409C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jenbot.Trivia", "Jenbot.Trivia\Jenbot.Trivia.csproj", "{DD9B7949-3C12-4CF8-9EDB-664E30B98C6B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jenbot.TriviaModule", "Jenbot.TriviaModule\Jenbot.TriviaModule.csproj", "{DD9B7949-3C12-4CF8-9EDB-664E30B98C6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jenbot.Chess", "Jenbot.Chess\Jenbot.Chess.csproj", "{8C1FAFE3-ABC1-4A0A-879A-1A548E540967}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jenbot.Interactables", "Jenbot.Interactables\Jenbot.Interactables.csproj", "{E4141465-951A-4BB8-AA65-6743E8E224A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jenbot.ChessModule", "Jenbot.ChessModule\Jenbot.ChessModule.csproj", "{8C1FAFE3-ABC1-4A0A-879A-1A548E540967}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,9 +24,5 @@ Global
 		{8C1FAFE3-ABC1-4A0A-879A-1A548E540967}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C1FAFE3-ABC1-4A0A-879A-1A548E540967}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C1FAFE3-ABC1-4A0A-879A-1A548E540967}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E4141465-951A-4BB8-AA65-6743E8E224A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4141465-951A-4BB8-AA65-6743E8E224A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E4141465-951A-4BB8-AA65-6743E8E224A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E4141465-951A-4BB8-AA65-6743E8E224A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
