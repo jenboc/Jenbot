@@ -1,4 +1,4 @@
-﻿namespace Jenbot.Chess;
+﻿namespace Jenbot.ChessModule.Api;
 
 public class Player
 {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Jenbot.Chess;
+namespace Jenbot.ChessModule.Api;
 
 public class ChessApi
 {

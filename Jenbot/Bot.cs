@@ -1,68 +1,61 @@
 ﻿using System.Reflection;
-using Discord;
-using Discord.Interactions;
-using Discord.WebSocket;
+using DSharpPlus;
+using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Configuration;
-using Jenbot.Interactables;
 
 namespace Jenbot;
 
 public class Bot
 {
     private const string CONFIG_FILE = "appsettings.json";
-    private readonly DiscordSocketClient _client;
-    private readonly InteractionService _interactionService;
-    private readonly BotConfig _config;
-
-    public static readonly Random Random = new Random();
+    private BotConfig _config;
+    private DiscordClient _client;
     
     public Bot()
     {
-        _client = new DiscordSocketClient(new DiscordSocketConfig()
-        {
-            UseInteractionSnowflakeDate = false,
-            UseSystemClock = false
-        });
-        _interactionService = new InteractionService(_client);
-        
-        _client.Log += Log;
-        _client.Ready += Ready;
-        _client.ButtonExecuted += InteractableManager.HandleComponents;
-        _client.SelectMenuExecuted += InteractableManager.HandleComponents;
-        _client.InteractionCreated += async (x) =>
-        {
-            var ctx = new SocketInteractionContext(_client, x);
-            await _interactionService.ExecuteCommandAsync(ctx, null);
-        };
-        
+        // Load config from appsettings.json 
         var configFile = new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            .AddJsonFile(CONFIG_FILE).Build();
+            .AddJsonFile(CONFIG_FILE)
+            .Build();
         _config = configFile.GetSection("BotConfig").Get<BotConfig>()
                   ?? throw new Exception($"Error loading {CONFIG_FILE} for Bot Configuration");
+        
+        // Instantiate Client 
+        var discordConfig = new DiscordConfiguration()
+        {
+            Token = _config.Token,
+            TokenType = TokenType.Bot,
+            Intents = DiscordIntents.AllUnprivileged
+        };
+        _client = new DiscordClient(discordConfig); 
     }
-
+    
+    /// <summary>
+    /// Start the bot 
+    /// </summary>
     public async Task Start()
     {
-        await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), null);
+        RegisterSlashCommands();
         
-        await _client.LoginAsync(TokenType.Bot, _config.Token);
-        await _client.StartAsync();
-        
-        // Delay task until program closed
-        await Task.Delay(-1);
+        // Start the bot 
+        await _client.ConnectAsync();
+        Console.WriteLine("Bot has started");
+        await Task.Delay(-1); 
     }
 
-    private async Task Ready()
+    /// <summary>
+    /// Register Bot Slash Commands
+    /// </summary>
+    private void RegisterSlashCommands()
     {
-        await _interactionService.RegisterCommandsGloballyAsync();
-        await _client.SetGameAsync("Being Bottastic");
+        var slash = _client.UseSlashCommands();
+        slash.RegisterCommands<ChessModule.ChessModule>();
     }
-
-    private Task Log(LogMessage message)
+    
+    // Struct for appsettings.json 
+    private class BotConfig
     {
-        // TODO: Write logging system
-        Console.WriteLine(message);
-        return Task.CompletedTask;
+        public string Token { get; set; }
     }
 }
