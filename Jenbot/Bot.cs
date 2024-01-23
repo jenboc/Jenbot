@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using DSharpPlus;
+using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
+using Jenbot.TriviaModule;
 using Microsoft.Extensions.Configuration;
 
 namespace Jenbot;
@@ -37,6 +39,7 @@ public class Bot
     public async Task Start()
     {
         RegisterSlashCommands();
+        _client.ComponentInteractionCreated += ComponentInteractionCreated;
         
         // Start the bot 
         await _client.ConnectAsync();
@@ -51,6 +54,23 @@ public class Bot
     {
         var slash = _client.UseSlashCommands();
         slash.RegisterCommands<ChessModule.ChessModule>();
+        slash.RegisterCommands<TriviaModule.TriviaModule>();
+    }
+
+    /// <summary>
+    /// Interaction Created Callback
+    /// </summary>
+    private async Task ComponentInteractionCreated(DiscordClient client, ComponentInteractionCreateEventArgs eventArgs)
+    {
+        // Check where the interaction came from 
+        var flag = eventArgs.Id[0];
+
+        switch (flag)
+        {
+            case 'T':
+                await TriviaModule.TriviaModule.HandleInteraction(client, eventArgs);
+                break;
+        }
     }
     
     // Struct for appsettings.json 

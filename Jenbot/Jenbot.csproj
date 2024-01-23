@@ -32,7 +32,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Jenbot.ChessModule\Jenbot.ChessModule.csproj" />
-        <ProjectReference Include="..\Jenbot.Trivia\Jenbot.Trivia.csproj" />
+        <ProjectReference Include="..\Jenbot.TriviaModule\Jenbot.TriviaModule.csproj" />
 
 
     </ItemGroup>

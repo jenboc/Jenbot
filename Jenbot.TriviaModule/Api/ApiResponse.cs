@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Jenbot.Trivia;
+namespace Jenbot.TriviaModule.Api;
 
 internal class ApiResponse
 {
