@@ -40,12 +40,23 @@ public class TriviaModule : ApplicationCommandModule
     {
         var id = eventArgs.Id;
 
-        foreach (var instance in _triviaInstances)
+        var toRemove = new List<int>(); 
+        for (int i = 0; i < _triviaInstances.Count; i++)
         {
+            var instance = _triviaInstances[i];
+            
             if (!instance.UsesCustomId(id))
                 continue;
             
             await instance.HandleAnswer(id, eventArgs.Interaction);
+            toRemove.Add(i);
         }
+
+        var diff = 0;
+        toRemove.ForEach(i =>
+        {
+            _triviaInstances.RemoveAt(i - diff);
+            diff++;
+        });
     }
 }
