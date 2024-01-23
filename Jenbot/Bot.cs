@@ -53,6 +53,7 @@ public class Bot
     private void RegisterSlashCommands()
     {
         var slash = _client.UseSlashCommands();
+        slash.RegisterCommands<BaseModule>(); 
         slash.RegisterCommands<ChessModule.ChessModule>();
         slash.RegisterCommands<TriviaModule.TriviaModule>();
     }
