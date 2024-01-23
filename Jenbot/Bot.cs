@@ -1,9 +1,8 @@
-﻿using System.Reflection;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
-using Jenbot.TriviaModule;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Jenbot;
 
@@ -28,7 +27,8 @@ public class Bot
         {
             Token = _config.Token,
             TokenType = TokenType.Bot,
-            Intents = DiscordIntents.AllUnprivileged
+            Intents = DiscordIntents.AllUnprivileged,
+            MinimumLogLevel = LogLevel.Debug
         };
         _client = new DiscordClient(discordConfig); 
     }
