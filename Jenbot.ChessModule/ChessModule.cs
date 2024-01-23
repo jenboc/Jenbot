@@ -9,7 +9,7 @@ public class ChessModule : ApplicationCommandModule
 {
     private static ChessApi _chessApi = new();
     
-    [SlashCommand("profilechess", "Get a chess.com profile")]
+    [SlashCommand("chesscom-profile", "Get a chess.com profile")]
     public async Task ChessComProfile(InteractionContext ctx, 
         [Option("username", "chess.com username")] string username)
     {
