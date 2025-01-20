@@ -74,9 +74,11 @@ public class Bot
         }
     }
     
-    // Struct for appsettings.json 
+    /// <summary>
+    /// Class for storing the config data
+    /// </summary>
     private class BotConfig
     {
-        public string Token { get; set; }
+        public required string Token { get; set; }
     }
 }
