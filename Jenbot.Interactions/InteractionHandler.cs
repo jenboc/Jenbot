@@ -3,6 +3,9 @@ using DSharpPlus.EventArgs;
 
 namespace Jenbot.Interactions;
 
+///<summary>
+/// Static class designed to deal with non-slash-command interactions
+///</summary>
 public static class InteractionHandler
 {
     private static Dictionary<Guid, InteractionObject> _registeredObjects;
@@ -12,12 +15,24 @@ public static class InteractionHandler
         _registeredObjects = new();
     }
 
+    ///<summary>
+    /// Register an Interaction Object with the InteractionHandler
+    ///</summary>
     public static void Register(InteractionObject obj)
-        => _registeredObjects.Add(obj.GetGuid(), obj);
+        => _registeredObjects.TryAdd(obj.GetGuid(), obj);
 
-    /// <summary>
+    ///<summary>
+    /// Unregister an Interaction Object from the InteractionHandler
+    ///</summary>
+    public static void Unregister(InteractionObject obj)
+    {
+        if (_registeredObjects.ContainsKey(obj.GetGuid()))
+            _registeredObjects.Remove(obj.GetGuid());
+    }
+
+    ///<summary>
     /// Handle DiscordClient.ComponentInteractionCreated event
-    /// </summary>
+    ///</summary>
     public static async Task OnComponentInteractionCreated(DiscordClient client, ComponentInteractionCreateEventArgs e)
     {
         var guid = new Guid(e.Id);
@@ -25,6 +40,6 @@ public static class InteractionHandler
         if (!_registeredObjects.TryGetValue(guid, out var obj))
             return;
 
-        obj.HandleInteraction(e.Interaction); 
+        await obj.HandleInteraction(e.Interaction); 
     }
 }
