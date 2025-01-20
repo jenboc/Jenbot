@@ -12,7 +12,10 @@ public class Button : InteractionObject
     public Button(string label, Colour colour=Colour.Blurple, bool enabled=true) : base()
     {
         _discordButton = new(ColourToStyle(colour), GetGuid().ToString(), label, !enabled);
-        InteractionHandler.Register(this);
+        
+        // Only register if enabled
+        if (enabled)
+            InteractionHandler.Register(this);
     }
 
     public async override Task HandleInteraction(DiscordInteraction interaction)
@@ -63,4 +66,15 @@ public class Button : InteractionObject
         Colour.Red => ButtonStyle.Danger,
         _ => ButtonStyle.Primary
     };
+
+    public override int GetHashCode()
+    {
+        // Hash Code only includes things that are fixed
+        var hashCode = GetGuid().GetHashCode();
+        hashCode = (hashCode * 397) ^ Label.GetHashCode();
+        hashCode = (hashCode * 397) ^ _discordButton.Style.GetHashCode();
+        hashCode = (hashCode * 397) ^ _discordButton.Emoji.GetHashCode();
+
+        return hashCode;
+    }
 }
