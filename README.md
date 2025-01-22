@@ -5,6 +5,7 @@ My own discord bot written in C# using the DSharpPlus wrapper for the Discord AP
 ### API Keys
 The following API keys and tokens are required:
 - Discord Bot token - can be created in the [Developer Portal](https://discord.com/developers/applications)
+- Wolfram Alpha Simple API AppID - can be obtained on [their website](https://products.wolframalpha.com/api/)
 
 ### Setup
 - Clone the repository
