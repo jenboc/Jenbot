@@ -36,7 +36,7 @@ public static class InteractionHandler
     public static async Task OnComponentInteractionCreated(DiscordClient client, ComponentInteractionCreateEventArgs e)
     {
         var guid = new Guid(e.Id);
-        
+     
         if (!_registeredObjects.TryGetValue(guid, out var obj))
             return;
 

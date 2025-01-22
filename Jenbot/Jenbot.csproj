@@ -28,6 +28,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Jenbot.ChessModule\Jenbot.ChessModule.csproj" />
         <ProjectReference Include="..\Jenbot.TriviaModule\Jenbot.TriviaModule.csproj" />
+        <ProjectReference Include="..\Jenbot.Interactions\Jenbot.Interactions.csproj" />
 
 
     </ItemGroup>

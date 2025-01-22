@@ -11,7 +11,7 @@ public class Button : InteractionObject
 
     public Button(string label, Colour colour=Colour.Blurple, bool enabled=true) : base()
     {
-        _discordButton = new(ColourToStyle(colour), GetGuid().ToString(), label, !enabled);
+        _discordButton = new DiscordButtonComponent(ColourToStyle(colour), GetGuid().ToString(), label, !enabled);
         
         // Only register if enabled
         if (enabled)
