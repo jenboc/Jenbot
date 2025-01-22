@@ -8,7 +8,6 @@ namespace Jenbot.TriviaModule;
 public class TriviaModule : ApplicationCommandModule
 {
     private static TriviaApi _api = new();
-    private static HashSet<TriviaInstance> _ongoingTrivia = new();
 
     [SlashCommand("trivia", "Answer a Trivia Question")]
     public async Task Trivia(InteractionContext ctx)
@@ -26,8 +25,5 @@ public class TriviaModule : ApplicationCommandModule
        
         var instance = new TriviaInstance(question);
         await instance.Start(ctx);
-
-        instance.OnQuestionAnswered += (sender, e) => _ongoingTrivia.Remove(instance);
-        _ongoingTrivia.Add(instance);
     }
 }

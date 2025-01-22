@@ -8,8 +8,6 @@ namespace Jenbot.TriviaModule;
 
 public class TriviaInstance
 {
-    public event EventHandler? OnQuestionAnswered;
-
     private TriviaQuestion _question;
     private int[] _ordering;
 
@@ -103,8 +101,6 @@ public class TriviaInstance
         await interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
             new DiscordInteractionResponseBuilder().WithContent(messageText)
         );
-
-        OnQuestionAnswered?.Invoke(this, EventArgs.Empty);
     }
 
     private async Task CorrectAnswerClickCallback(object sender, InteractionEventArgs e)
