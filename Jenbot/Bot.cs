@@ -31,9 +31,19 @@ public class Bot
             Intents = DiscordIntents.AllUnprivileged,
             MinimumLogLevel = LogLevel.Debug
         };
-        _client = new DiscordClient(discordConfig); 
+        _client = new DiscordClient(discordConfig);
+        
+        SetupModules();
     }
     
+    ///<summary>
+    /// Setup the bot modules, i.e. setup API keys, etc.
+    ///</summary>
+    private void SetupModules()
+    {
+        MathsModule.MathsModule.UseWolframApiKey(_config.WolframAppId);
+    }
+
     /// <summary>
     /// Start the bot 
     /// </summary>
@@ -57,6 +67,7 @@ public class Bot
         slash.RegisterCommands<BaseModule>(); 
         slash.RegisterCommands<ChessModule.ChessModule>();
         slash.RegisterCommands<TriviaModule.TriviaModule>();
+        slash.RegisterCommands<MathsModule.MathsModule>();
     }
 
     /// <summary>
@@ -65,5 +76,6 @@ public class Bot
     private class BotConfig
     {
         public required string Token { get; set; }
+        public required string WolframAppId { get; set; }
     }
 }
