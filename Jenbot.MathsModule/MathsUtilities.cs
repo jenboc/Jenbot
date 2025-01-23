@@ -1,3 +1,5 @@
+using Jenbot.MathsModule.LatexCompilation;
+
 namespace Jenbot.MathsModule;
 
 internal static class MathsUtilities
@@ -12,6 +14,9 @@ internal static class MathsUtilities
         return filename;
     }
 
-    public static void DeleteImage(string filePath)
-        => File.Delete(filePath);
+    public static LatexDocumentBuilder GetDefaultStandaloneLatexBuilder() => new LatexDocumentBuilder()
+        .SetDocumentClass(LatexDocumentClass.Standalone, 
+                new Dictionary<string,string>() { {"preview", ""} })
+        .AddPackage("amsfonts")
+        .AddPackage("amsmath");
 }

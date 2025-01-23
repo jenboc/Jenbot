@@ -1,25 +1,95 @@
+using System.Text;
+
 namespace Jenbot.MathsModule.LatexCompilation;
 
 public class LatexDocument
 {
+    private LatexCommand _documentClassCommand;
+    private IEnumerable<LatexCommand> _packageCommands;
+
     // Preamble stuff (i.e. packages and title page shenanigans)
-    public IEnumerable<string> Packages { get; private set; }
+    public string DocumentClass => _documentClassCommand.GetPrincipleArgument();
+    public IEnumerable<string> Packages => _packageCommands.Select(x => x.GetPrincipleArgument());
     public string? Title { get; private set; }
     public string? Author { get; private set; }
     public string? Date { get; private set; }
 
     public string Content { get; private set; }
 
-    public LatexDocument(IEnumerable<string> packages, string? title,
-            string? author, string? date, string content)
+    public LatexDocument(LatexCommand docClassCommand, IEnumerable<LatexCommand> packageCommands,
+            string? title, string? author, string? date, string content)
     {
-        Packages = packages;
+        _documentClassCommand = docClassCommand;
+        _packageCommands = packageCommands;
         Title = title;
         Author = author;
         Date = date;
         Content = content;
     }
 
+    public string GetFileContents()
+    {
+        var builder = new StringBuilder();
+
+        builder.AppendLine(BuildPreambleString());
+        builder.AppendLine("\\begin{document}");
+        builder.AppendLine(BuildContentString());
+        builder.AppendLine("\\end{document}");
+
+        return builder.ToString();
+    }
+
     public string Compile(string filename, CompilationTarget target)
         => LatexCompiler.Compile(this, filename, target);
+
+    private string BuildPreambleString()
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine(_documentClassCommand.GetLatexCode());
+     
+        foreach (var comm in _packageCommands)
+            builder.AppendLine(comm.GetLatexCode());
+
+        if (ShouldMakeTitle())
+            builder.AppendLine(BuildTitlePreambleString());
+
+        return builder.ToString();
+    }
+
+    private string BuildContentString()
+    {
+        if (!ShouldMakeTitle())
+        {
+            return Content;
+        }
+
+        var builder = new StringBuilder();
+        builder.AppendLine("\\maketitle");
+        builder.AppendLine(Content);
+        return builder.ToString();
+    }
+
+    private string BuildTitlePreambleString()
+    {
+        var optionals = new Dictionary<string, string?>()
+        { 
+            {"title", Title},
+            {"author", Author},
+            {"date", Date}
+        };
+        var builder = new StringBuilder();
+
+        foreach (var pair in optionals)
+        {
+            if (pair.Value == null) continue;
+
+            var command = new LatexCommand(pair.Key, pair.Value);
+            builder.AppendLine(command.GetLatexCode());
+        }
+
+        return builder.ToString();
+    }
+
+    private bool ShouldMakeTitle()
+        => Title != null;
 }

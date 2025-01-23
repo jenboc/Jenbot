@@ -2,7 +2,11 @@ namespace Jenbot.MathsModule.LatexCompilation;
 
 public class LatexDocumentBuilder
 {
-    private HashSet<string> _packages;
+    private const string DOCUMENT_CLASS_COMMAND = "documentclass";
+    private const string USE_PACKAGE_COMMAND = "usepackage";
+
+    private LatexCommand _documentClassCommand;
+    private List<LatexCommand> _packageCommands;
     private string? _title;
     private string? _author;
     private string? _date;
@@ -11,13 +15,47 @@ public class LatexDocumentBuilder
 
     public LatexDocumentBuilder()
     {
-        _packages = new();
+        _documentClassCommand = new(DOCUMENT_CLASS_COMMAND, "article");
+        _packageCommands = new();
         _content = string.Empty;
+    }
+
+    public LatexDocumentBuilder SetDocumentClass(LatexDocumentClass documentClass,
+            IDictionary<string, string> optionalArguments)
+    {
+        _documentClassCommand = new(DOCUMENT_CLASS_COMMAND, GetDocClassString(documentClass), optionalArguments);
+        return this;
+    }
+
+    public LatexDocumentBuilder SetDocumentClass(LatexDocumentClass documentClass)
+    {
+        _documentClassCommand = new(DOCUMENT_CLASS_COMMAND, GetDocClassString(documentClass));
+        return this;
+    }
+
+    private static string GetDocClassString(LatexDocumentClass dc) => dc switch 
+    {
+        LatexDocumentClass.Article => "article",
+        LatexDocumentClass.Report => "report",
+        LatexDocumentClass.Book => "book",
+        LatexDocumentClass.Standalone => "standalone",
+        // This shouldn't happen
+        _ => throw new ArgumentOutOfRangeException("You cannot use that document class here")
+    };
+
+    public LatexDocumentBuilder AddPackage(string packageName, IDictionary<string, string> optionalArguments)
+    {
+        var command = new LatexCommand(USE_PACKAGE_COMMAND, packageName, optionalArguments);
+        _packageCommands.Add(command);
+
+        return this;
     }
 
     public LatexDocumentBuilder AddPackage(string packageName)
     {
-        _packages.Add(packageName);
+        var command = new LatexCommand(USE_PACKAGE_COMMAND, packageName);
+        _packageCommands.Add(command);
+
         return this;
     }
 
@@ -58,5 +96,5 @@ public class LatexDocumentBuilder
     }
 
     public LatexDocument Build()
-        => new LatexDocument(_packages, _title, _author, _date, _content);
+        => new LatexDocument(_documentClassCommand, _packageCommands, _title, _author, _date, _content);
 }
