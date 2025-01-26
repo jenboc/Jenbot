@@ -6,6 +6,7 @@ public class LatexDocument
 {
     private LatexCommand _documentClassCommand;
     private IEnumerable<LatexCommand> _packageCommands;
+    private IEnumerable<LatexCommand> _preambleCommands;
 
     // Preamble stuff (i.e. packages and title page shenanigans)
     public string DocumentClass => _documentClassCommand.GetPrincipleArgument();
@@ -17,10 +18,12 @@ public class LatexDocument
     public string Content { get; private set; }
 
     public LatexDocument(LatexCommand docClassCommand, IEnumerable<LatexCommand> packageCommands,
-            string? title, string? author, string? date, string content)
+            IEnumerable<LatexCommand> preambleCommands, string? title, string? author, string? date,
+            string content)
     {
         _documentClassCommand = docClassCommand;
         _packageCommands = packageCommands;
+        _preambleCommands = preambleCommands;
         Title = title;
         Author = author;
         Date = date;
@@ -48,6 +51,9 @@ public class LatexDocument
         builder.AppendLine(_documentClassCommand.GetLatexCode());
      
         foreach (var comm in _packageCommands)
+            builder.AppendLine(comm.GetLatexCode());
+
+        foreach (var comm in _preambleCommands)
             builder.AppendLine(comm.GetLatexCode());
 
         if (ShouldMakeTitle())

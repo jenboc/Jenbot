@@ -60,6 +60,13 @@ public class MathsModule : ApplicationCommandModule
     {
         await ctx.DeferAsync();
 
+        if (!LatexUtilities.IsCodeSnippetSafe(snippet))
+        {
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
+                .WithContent($"{ctx.User.Mention}, unsafe content detected. Will not compile."));
+            return;
+        }
+
         var latexDoc = MathsUtilities.GetDefaultStandaloneLatexBuilder()
             .SetContent(snippet).Build();
 

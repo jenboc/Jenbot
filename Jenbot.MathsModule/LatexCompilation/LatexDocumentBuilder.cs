@@ -7,6 +7,7 @@ public class LatexDocumentBuilder
 
     private LatexCommand _documentClassCommand;
     private List<LatexCommand> _packageCommands;
+    private List<LatexCommand> _otherPreambleCommands;
     private string? _title;
     private string? _author;
     private string? _date;
@@ -17,6 +18,7 @@ public class LatexDocumentBuilder
     {
         _documentClassCommand = new(DOCUMENT_CLASS_COMMAND, "article");
         _packageCommands = new();
+        _otherPreambleCommands = new();
         _content = string.Empty;
     }
 
@@ -59,6 +61,23 @@ public class LatexDocumentBuilder
         return this;
     }
 
+    public LatexDocumentBuilder AddPreambleCommand(string commandName, string argument)
+    {
+        var command = new LatexCommand(commandName, argument);
+        _otherPreambleCommands.Add(command);
+
+        return this;
+    }
+
+    public LatexDocumentBuilder AddPreambleCommand(string commandName, string argument,
+            IDictionary<string, string> optionalArguments)
+    {
+        var command = new LatexCommand(commandName, argument, optionalArguments);
+        _packageCommands.Add(command);
+
+        return this;
+    }
+
     public LatexDocumentBuilder SetTitle(string title)
     {
         _title = title;
@@ -96,5 +115,6 @@ public class LatexDocumentBuilder
     }
 
     public LatexDocument Build()
-        => new LatexDocument(_documentClassCommand, _packageCommands, _title, _author, _date, _content);
+        => new LatexDocument(_documentClassCommand, _packageCommands, _otherPreambleCommands,
+                _title, _author, _date, _content);
 }

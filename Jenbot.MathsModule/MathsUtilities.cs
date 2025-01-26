@@ -16,7 +16,12 @@ internal static class MathsUtilities
 
     public static LatexDocumentBuilder GetDefaultStandaloneLatexBuilder() => new LatexDocumentBuilder()
         .SetDocumentClass(LatexDocumentClass.Standalone, 
-                new Dictionary<string,string>() { {"preview", ""} })
+                new Dictionary<string,string>() { {"varwidth", ""}, {"border", "5pt"} })
         .AddPackage("amsfonts")
-        .AddPackage("amsmath");
+        .AddPackage("amsmath")
+        .AddPackage("xcolor")
+        .AddPreambleCommand("pagecolor", "0.1725490196,0.1843137255,0.2",
+                new Dictionary<string,string>() { {"rgb", ""} })
+        .AddPreambleCommand("color", "1,1,1",
+                new Dictionary<string, string>() { {"rgb", ""} });
 }
