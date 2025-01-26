@@ -1,4 +1,5 @@
 ﻿using DSharpPlus;
+using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -24,16 +25,21 @@ public class Bot
                   ?? throw new Exception($"Error loading {CONFIG_FILE} for Bot Configuration");
         
         // Instantiate Client 
+        var intents = DiscordIntents.MessageContents
+            | DiscordIntents.GuildMessages
+            | DiscordIntents.DirectMessages;
         var discordConfig = new DiscordConfiguration()
         {
             Token = _config.Token,
             TokenType = TokenType.Bot,
-            Intents = DiscordIntents.AllUnprivileged,
+            Intents = intents,
             MinimumLogLevel = LogLevel.Debug
         };
         _client = new DiscordClient(discordConfig);
-        
+    
         SetupModules();
+
+        _client.MessageCreated += OnMessageSent;
     }
     
     ///<summary>
@@ -42,6 +48,15 @@ public class Bot
     private void SetupModules()
     {
         MathsModule.MathsModule.UseWolframApiKey(_config.WolframAppId);
+    }
+
+    ///<summary>
+    /// Call all functions which should run on Message Sent
+    ///</summary>
+    private async Task OnMessageSent(DiscordClient s, MessageCreateEventArgs e)
+    {
+        Console.WriteLine("Message Sent");
+        await MathsModule.MathsModule.OnMessageSent(s, e);
     }
 
     /// <summary>

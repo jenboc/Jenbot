@@ -1,4 +1,5 @@
 using DSharpPlus;
+using DSharpPlus.EventArgs;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 
@@ -90,6 +91,48 @@ public class MathsModule : ApplicationCommandModule
                 .WithContent($"{ctx.User.Mention}, something went wrong in compilation:\n```\n{e.Message}\n```")
             );
             Console.WriteLine($"[LATEXCOMPILATION ERROR] {e}");
+        }
+    }
+
+    public static async Task OnMessageSent(DiscordClient s, MessageCreateEventArgs e)
+    {
+        var content = e.Message.Content;
+        
+        Console.WriteLine(content);
+        Console.WriteLine($"MM: {LatexUtilities.SnippetUsesMathsMode(content)}");
+        Console.WriteLine($"LC: {LatexUtilities.SnippetUsesCommands(content)}");
+        Console.WriteLine($"IS: {LatexUtilities.IsCodeSnippetSafe(content)}");
+
+
+        // If we don't use maths mode or commands then why compile?
+        // Further, we don't compile if it is not safe to do so
+        if ((!LatexUtilities.SnippetUsesMathsMode(content) 
+                && !LatexUtilities.SnippetUsesCommands(content))
+                || !LatexUtilities.IsCodeSnippetSafe(content))
+            return;
+
+        // Content is indeed a latex snippet, and is safe so we can compile
+        var latexDoc = MathsUtilities.GetDefaultStandaloneLatexBuilder()
+            .SetContent(content).Build();
+
+        try
+        {
+            var guid = Guid.NewGuid();
+            var imgPath = latexDoc.Compile(guid.ToString(), CompilationTarget.Image);
+
+            var fs = new FileStream(imgPath, FileMode.Open, FileAccess.Read);
+
+            await e.Message.RespondAsync(new DiscordMessageBuilder()
+                .AddFiles(new Dictionary<string, Stream> { { "latex.jpg", fs } })
+            );
+
+            fs.Close();
+            File.Delete(imgPath);
+        }
+        catch (CompilationFailException ex)
+        {
+            await e.Message.RespondAsync(new DiscordMessageBuilder()
+                .WithContent($"{e.Author.Mention}, something went wrong in compilation:\n```\n{ex.Message}\n```"));
         }
     }
 }
