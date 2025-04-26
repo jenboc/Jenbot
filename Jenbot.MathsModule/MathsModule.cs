@@ -91,6 +91,7 @@ public class MathsModule : ApplicationCommandModule
                 .WithContent($"{ctx.User.Mention}, something went wrong in compilation:\n```\n{e.Message}\n```")
             );
             Console.WriteLine($"[LATEXCOMPILATION ERROR] {e}");
+            File.Delete(e.PdfPath);
         }
     }
 
@@ -131,6 +132,7 @@ public class MathsModule : ApplicationCommandModule
         {
             await e.Message.RespondAsync(new DiscordMessageBuilder()
                 .WithContent($"{e.Author.Mention}, something went wrong in compilation:\n```\n{ex.Message}\n```"));
+            File.Delete(ex.PdfPath);
         }
     }
 }

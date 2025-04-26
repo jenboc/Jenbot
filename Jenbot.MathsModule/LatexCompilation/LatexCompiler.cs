@@ -49,25 +49,20 @@ public static class LatexCompiler
 
         proc.WaitForExit();
 
+        // Delete any files we created for creation
+        File.Delete(texPath);
+        File.Delete($"{filename}.log");
+        File.Delete($"{filename}.aux");
+
+        // Did we error?
         if (proc.ExitCode != 0)
         {
             var errorMessage = FindUndefinedControlSequences(proc.StandardOutput.ReadToEnd());
-            CleanupFiles(texPath, filename);
-            throw new CompilationFailException(errorMessage);
+            throw new CompilationFailException(pdfPath, errorMessage);
         }
-
-        // We can now delete the tex file, and the log and aux file generated in compilation
-        CleanupFiles(texPath, filename);
 
         // We need to return the path to the PDF
         return pdfPath;
-    }
-
-    private static void CleanupFiles(string texPath, string filename)
-    {
-        File.Delete(texPath);
-        File.Delete($"{filename}.log");
-        File.Delete($"{filename}.aux"); 
     }
 
     ///<summary>
