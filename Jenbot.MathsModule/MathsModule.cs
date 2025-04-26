@@ -96,14 +96,12 @@ public class MathsModule : ApplicationCommandModule
 
     public static async Task OnMessageSent(DiscordClient s, MessageCreateEventArgs e)
     {
+        // Ignore bot messages
+        if (e.Author.IsBot)
+            return;
+
         var content = e.Message.Content;
         
-        Console.WriteLine(content);
-        Console.WriteLine($"MM: {LatexUtilities.SnippetUsesMathsMode(content)}");
-        Console.WriteLine($"LC: {LatexUtilities.SnippetUsesCommands(content)}");
-        Console.WriteLine($"IS: {LatexUtilities.IsCodeSnippetSafe(content)}");
-
-
         // If we don't use maths mode or commands then why compile?
         // Further, we don't compile if it is not safe to do so
         if ((!LatexUtilities.SnippetUsesMathsMode(content) 

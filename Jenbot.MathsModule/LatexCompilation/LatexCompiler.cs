@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 
 namespace Jenbot.MathsModule.LatexCompilation;
 
@@ -40,7 +41,7 @@ public static class LatexCompiler
             FileName = "pdflatex",
             Arguments = $"-interaction=nonstopmode {texPath}",
             CreateNoWindow = true,
-            RedirectStandardError = true
+            RedirectStandardOutput = true
         };
         var proc = Process.Start(procStartInfo);
 
@@ -48,17 +49,59 @@ public static class LatexCompiler
 
         proc.WaitForExit();
 
-        var stderr = proc.StandardError.ReadToEnd();
-        if (stderr.Length > 0)
-            throw new CompilationFailException(stderr);
+        if (proc.ExitCode != 0)
+        {
+            var errorMessage = FindUndefinedControlSequences(proc.StandardOutput.ReadToEnd());
+            CleanupFiles(texPath, filename);
+            throw new CompilationFailException(errorMessage);
+        }
 
         // We can now delete the tex file, and the log and aux file generated in compilation
-        File.Delete(texPath);
-        File.Delete($"{filename}.log");
-        File.Delete($"{filename}.aux");
-        
+        CleanupFiles(texPath, filename);
+
         // We need to return the path to the PDF
         return pdfPath;
+    }
+
+    private static void CleanupFiles(string texPath, string filename)
+    {
+        File.Delete(texPath);
+        File.Delete($"{filename}.log");
+        File.Delete($"{filename}.aux"); 
+    }
+
+    ///<summary>
+    /// Find undefined control sequence messages in pdflatex std output
+    ///</summary>
+    private static string FindUndefinedControlSequences(string stdout)
+    {
+        Console.WriteLine(stdout);
+        Console.WriteLine("-------------");
+        var outputLines = stdout.Split(new []{ "\n", "\r\n" }, StringSplitOptions.None);
+        var messageBuilder = new StringBuilder();
+        var errorMessage = false;
+
+        foreach (var line in outputLines)
+        {
+            // Is this the start of an error message?
+            if (!errorMessage && line.StartsWith("! Undefined control sequence."))
+                errorMessage = true;
+
+            if (!errorMessage)
+                continue;
+
+            // Is this the end of the error message?
+            if (string.IsNullOrEmpty(line) || !line.StartsWith(" ") && !line.StartsWith("l.") && !line.StartsWith("!")
+                    && !line.StartsWith("<"))
+            {
+                errorMessage = false;
+                continue;
+            }
+
+            messageBuilder.AppendLine(line);
+        }
+
+        return messageBuilder.ToString();
     }
 
     private static string ConvertPdfToJpeg(string pdfPath, string filename)
