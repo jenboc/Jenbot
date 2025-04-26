@@ -83,6 +83,7 @@ public class Bot
         slash.RegisterCommands<ChessModule.ChessModule>();
         slash.RegisterCommands<TriviaModule.TriviaModule>();
         slash.RegisterCommands<MathsModule.MathsModule>();
+        slash.RegisterCommands<GamesModule.GamesModule>();
     }
 
     /// <summary>
