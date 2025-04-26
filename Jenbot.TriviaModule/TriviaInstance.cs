@@ -1,86 +1,110 @@
-﻿using System.Web;
-using DSharpPlus;
-using DSharpPlus.Entities;
+﻿using DSharpPlus;
 using DSharpPlus.SlashCommands;
+using DSharpPlus.Entities;
+using Jenbot.Interactions;
 using Jenbot.TriviaModule.Api;
 
 namespace Jenbot.TriviaModule;
 
 public class TriviaInstance
 {
-    private InteractionContext _ctx;
     private TriviaQuestion _question;
-    private List<DiscordButtonComponent> _buttons;
-    private string _correctAnswerId;
-    private ulong _followupMessageId;
+    private int[] _ordering;
 
-    public TriviaInstance(InteractionContext ctx, TriviaQuestion question)
+    private ulong? _messageId;
+    private InteractionContext? _ctx;
+
+    public TriviaInstance(TriviaQuestion question)
     {
-        _ctx = ctx;
         _question = question;
-        _buttons = new List<DiscordButtonComponent>();
-        CreateButtons(); 
+
+        // Ordering is a random permutation of integers in [0,#IncorrectAnswers]
+        // Largest integer represents correct answer, the others represent their 
+        // corresponding array elements in IncorrectAnswers
+        _ordering = new int[question.IncorrectAnswers.Length + 1];
+        
+        for (var i = 0; i < _ordering.Length; i++)
+            _ordering[i] = i;
+
+        // We shuffle this
+        _ordering = _ordering.OrderBy(x => Random.Shared.Next()).ToArray();
     }
-    
-    private void CreateButtons()
+
+    ///<summary>
+    /// Start the trivia
+    ///</summary>
+    public async Task Start(InteractionContext ctx)
     {
-        var r = new Random();
+        var buttons = CreateButtons(false, true);
+        var embed = (new TriviaEmbedBuilder(_question)).Build();
+        
+        // Send the message
+        var buttonComponents = buttons.Select(b => b.GetComponent());
+        var message = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
+                .AddEmbed(embed).AddComponents(buttonComponents)
+        );
 
-        var options = _question.IncorrectAnswers.ToList();
-        options.Add(_question.CorrectAnswer);
+        // Set the context and message ID so that we can edit later.
+        _ctx = ctx;
+        _messageId = message.Id;
+    }
 
-        var correctAnswer = HttpUtility.HtmlDecode(_question.CorrectAnswer);
+    private Button CreateButton(string label, Button.Colour colour, bool enabled, InteractionEventHandler? eventHandler)
+    {
+        var button = new Button(label, colour: colour, enabled: enabled);
 
-        foreach (var button in options.OrderBy(x => r.Next()).Select(o =>
-                     new DiscordButtonComponent(ButtonStyle.Primary, "T"+Guid.NewGuid().ToString(),
-                         HttpUtility.HtmlDecode(o))))
+        if (enabled && eventHandler != null)
+            button.OnButtonClick += eventHandler;
+
+        return button;
+    }
+
+    private IEnumerable<Button> CreateButtons(bool coloured, bool enabled)
+    {
+        var (correctColour, incorrectColour) = coloured 
+            ? (Button.Colour.Green, Button.Colour.Red)
+            : (Button.Colour.Blurple, Button.Colour.Blurple);
+
+        foreach (var i in _ordering)
         {
-            _buttons.Add(button);
-
-            if (string.Equals(button.Label, correctAnswer, StringComparison.CurrentCultureIgnoreCase))
-                _correctAnswerId = button.CustomId;
+            // Represents correct answer
+            if (i >= _question.IncorrectAnswers.Length)
+            {
+                yield return CreateButton(_question.CorrectAnswer, correctColour, enabled, CorrectAnswerClickCallback);
+                continue;
+            }
+            
+            yield return CreateButton(_question.IncorrectAnswers[i], incorrectColour, enabled, IncorrectAnswerClickCallback);
         }
     }
 
-    private void RecolourButtons()
+    private async Task SendResults(DiscordInteraction interaction, bool wasCorrect)
     {
-        var newButtons = new List<DiscordButtonComponent>();
-        
-        foreach (var button in _buttons)
-        {
-            var colour = button.CustomId == _correctAnswerId ? ButtonStyle.Success : ButtonStyle.Danger;
-            var newButton = new DiscordButtonComponent(colour, button.CustomId, button.Label, true);
-            newButtons.Add(newButton);
-        }
+        if (_messageId == null || _ctx == null)
+            return;
 
-        _buttons = newButtons;
-    }
+        var embed = (new TriviaEmbedBuilder(_question)).Build();
+        var colouredButtons = CreateButtons(true, false);
+        var buttonComponents = colouredButtons.Select(b => b.GetComponent());        
 
-    public async Task HandleAnswer(string customId, DiscordInteraction interaction)
-    {
-        // Edit the message with recoloured buttons
-        RecolourButtons();
-        await _ctx.EditFollowupAsync(_followupMessageId,
-            new DiscordWebhookBuilder().AddEmbed(GetEmbed()).AddComponents(_buttons));
-        
-        // Tell the user if they are right or wrong 
-        var message = customId == _correctAnswerId
-            ? $"Well done, {interaction.User.Mention}! You got it right!"
-            : $"Unlucky {interaction.User.Mention}. You got it wrong.";
+        var mention = interaction.User.Mention;
+        var messageText = wasCorrect
+            ? $"Well done, {mention}! You got it right!"
+            : $"Unlucky {mention}. You got it wrong.";
+
+        // Edit original message to disable & colour buttons
+        await _ctx.EditFollowupAsync(_messageId.Value,
+            new DiscordWebhookBuilder().AddEmbed(embed).AddComponents(buttonComponents)
+        );
+
+        // Send success/fail message
         await interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
-            new DiscordInteractionResponseBuilder().WithContent(message));
+            new DiscordInteractionResponseBuilder().WithContent(messageText)
+        );
     }
 
-    public bool UsesCustomId(string customId)
-    {
-        foreach (var button in _buttons)
-            if (button.CustomId == customId)
-                return true;
-
-        return false;
-    }
-
-    public void SetFollowupId(ulong id) => _followupMessageId = id; 
-    public DiscordEmbed GetEmbed() => (new TriviaEmbedBuilder(_question)).Build();
-    public List<DiscordButtonComponent> GetButtons() => _buttons;
+    private async Task CorrectAnswerClickCallback(object sender, InteractionEventArgs e)
+        => await SendResults(e.Interaction, true);
+    private async Task IncorrectAnswerClickCallback(object sender, InteractionEventArgs e)
+        => await SendResults(e.Interaction, false);
 }

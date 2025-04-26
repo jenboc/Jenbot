@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+        <PackageReference Include="DSharpPlus" Version="4.4.6" />
+        <PackageReference Include="DSharpPlus.SlashCommands" Version="4.4.6" />
+  </ItemGroup>
+
+
+</Project>

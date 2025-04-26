@@ -1,14 +1,15 @@
-﻿using System.Text;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
-using DSharpPlus.SlashCommands.Attributes;
 
 namespace Jenbot;
 
 public class BaseModule : ApplicationCommandModule
 {
-    private static Dictionary<ulong, List<ulong>> _broadcastIgnore = [];
+    private const string WEBSITE_URL = "https://www.jensoncain.co.uk";
+    private const string ITCH_URL = "https://jenboc.itch.io";
+    private const string GITHUB_PROFILE_URL = "https://github.com/jenboc";
+    private const string GITHUB_REPO_URL = "https://github.com/jenboc/Jenbot";
 
     [SlashCommand("ping", "Ping the bot to ensure that it is running")]
     public async Task Ping(InteractionContext ctx)
@@ -16,129 +17,40 @@ public class BaseModule : ApplicationCommandModule
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
             new DiscordInteractionResponseBuilder().WithContent("Pong!")); 
     }
-
-    [SlashCommand("broadcast-exclude", "Exclude a server member from Jenbot broadcasts")]
-    [SlashRequirePermissions(Permissions.Administrator)]
-    public async Task BroadcastExclude(InteractionContext ctx,
-        [Option("user", "user to exclude")]
-        DiscordUser user)
+    
+    [SlashCommand("creator-website", "Get a link to the creator's website")]
+    public async Task CreatorWebsite(InteractionContext ctx)
     {
-        var guildId = ctx.Guild.Id;
-
-        if (!_broadcastIgnore.ContainsKey(guildId)) 
-            _broadcastIgnore.Add(guildId, []);
-
-        _broadcastIgnore[guildId].Add(user.Id);
+        var message = $"Check out Jenson's website here: {WEBSITE_URL}";
 
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
-            new DiscordInteractionResponseBuilder()
-                .WithContent("Excluded user successfully")
-                .AsEphemeral(true));
+            new DiscordInteractionResponseBuilder().WithContent(message));
     }
 
-    [SlashCommand("broadcast-unexclude", "Re-include a server member in Jenbot broadcasts")]
-    [SlashRequirePermissions(Permissions.Administrator)]
-    public async Task BroadcastUnexclude(InteractionContext ctx,
-        [Option("user", "user to reinclude")]
-        DiscordUser user)
+    [SlashCommand("creator-itch", "Get a link to the creator's itch.io page")]
+    public async Task CreatorItch(InteractionContext ctx)
     {
-        var guildId = ctx.Guild.Id;
-
-        if (!_broadcastIgnore.TryGetValue(guildId, out var excluded) || !excluded.Contains(user.Id))
-        {
-            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
-                new DiscordInteractionResponseBuilder().WithContent("This user wasn't excluded from broadcasts")
-                    .AsEphemeral(true));
-            return;
-        }
-
-        _broadcastIgnore[guildId].Remove(user.Id);
+        var message = $"Check out Jenson's itch.io page here: {ITCH_URL}";
 
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
-            new DiscordInteractionResponseBuilder().WithContent("User was re-included in broadcasts")
-                .AsEphemeral(true));
+            new DiscordInteractionResponseBuilder().WithContent(message));
     }
 
-    [SlashCommand("broadcast-list", "List the members of the server who will receive broadcast messages")]
-    [SlashRequirePermissions(Permissions.Administrator)]
-    public async Task BroadcastList(InteractionContext ctx)
+    [SlashCommand("creator-github", "Get a link to the creator's github page")]
+    public async Task CreatorGithub(InteractionContext ctx)
     {
-        // Filter guild members based on if they will receive messages or not
-        var guildMembers = ctx.Guild.Members.Values;
-
-        var excludedIds = _broadcastIgnore.TryGetValue(ctx.Guild.Id, out var ids) ? ids : [];
-
-        var excluded = new StringBuilder();
-        var included = new StringBuilder();
-
-        foreach (var m in guildMembers) 
-        {
-            if (excludedIds.Contains(m.Id))
-            {
-                excluded.AppendLine(m.DisplayName);
-                continue;
-            }
-
-            included.AppendLine(m.DisplayName);
-        }
-
-        // Create an embed
-        var embed = new DiscordEmbedBuilder().WithTitle("Broadcast Recipients");
-        
-        if (included.Length > 0)
-            embed.AddField("Recipients", included.ToString(), true);
-
-        if (excluded.Length > 0)
-            embed.AddField("Excluded", excluded.ToString(), true);
+        var message = $"Check out Jenson's github page here: {GITHUB_PROFILE_URL}";
 
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
-            new DiscordInteractionResponseBuilder()
-                .AddEmbed(embed)
-                .AsEphemeral(true));
+            new DiscordInteractionResponseBuilder().WithContent(message));
     }
 
-    [SlashCommand("broadcast", "Send a DM to everyone (apart from the excluded members) in the server")]
-    [SlashRequirePermissions(Permissions.Administrator)]
-    public async Task Broadcast(InteractionContext ctx,
-        [Option("message", "message to broadcast")]
-        string message) 
+    [SlashCommand("bot-github", "Get a link to the bot's github repository")]
+    public async Task BotGithub(InteractionContext ctx)
     {
-        await ctx.DeferAsync(true);
+        var message = $"Check out this bot's github repository here: {GITHUB_REPO_URL}";
 
-        // Construct a list of recipients
-        var memberList = ctx.Guild.Members.Values;
-
-        if (_broadcastIgnore.TryGetValue(ctx.Guild.Id, out var excluded))
-            memberList = memberList.Where(m => !excluded.Contains(m.Id));
-        
-        // Send a private message to each user that isn't excluded
-        var dmEmbed = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Red)
-            .WithTitle("Automated Message")
-            .WithAuthor(ctx.Member.DisplayName, iconUrl: ctx.User.AvatarUrl)
-            .WithFooter($"Please respond to {ctx.User.Username} (aka {ctx.Member.DisplayName} from {ctx.Guild.Name})")
-            .WithDescription(message);
-
-        var usernames = new StringBuilder();
-        foreach (var u in memberList)
-        {
-            // Don't DM bots 
-            if (u.IsBot)
-                continue;
-
-            await u.SendMessageAsync(dmEmbed);
-            usernames.AppendLine(u.DisplayName);
-        }
-
-        // Create a result embed and send it
-        var summaryEmbed = new DiscordEmbedBuilder()
-            .WithTitle("Sent Broadcast Message")
-            .WithAuthor(ctx.User.Username, iconUrl: ctx.User.AvatarUrl)
-            .WithDescription(message)
-            .AddField("Recipients", usernames.ToString()); 
-
-        await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
-                .AddEmbed(summaryEmbed)
-        );  
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
+            new DiscordInteractionResponseBuilder().WithContent(message));
     }
 }

@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -28,6 +28,9 @@
     <ItemGroup>
         <ProjectReference Include="..\Jenbot.ChessModule\Jenbot.ChessModule.csproj" />
         <ProjectReference Include="..\Jenbot.TriviaModule\Jenbot.TriviaModule.csproj" />
+        <ProjectReference Include="..\Jenbot.Interactions\Jenbot.Interactions.csproj" />
+        <ProjectReference Include="..\Jenbot.MathsModule\Jenbot.MathsModule.csproj" />
+        <ProjectReference Include="..\Jenbot.GamesModule\Jenbot.GamesModule.csproj" />
 
 
     </ItemGroup>
