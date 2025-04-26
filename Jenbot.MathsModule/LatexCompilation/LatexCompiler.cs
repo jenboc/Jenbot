@@ -38,7 +38,7 @@ public static class LatexCompiler
         var procStartInfo = new ProcessStartInfo()
         {
             FileName = "pdflatex",
-            Arguments = texPath,
+            Arguments = $"-interaction=nonstopmode {texPath}",
             CreateNoWindow = true,
             RedirectStandardError = true
         };
