@@ -1,45 +1,46 @@
 namespace Jenbot.GamesModule.NoughtsAndCrosses;
 
-public class State
+public class Board
 {
     private Tile[,] _tiles;
-    private int[,] _placementTime;
 
-    private int _clock;
-    private int _size;
+    public int Size { get; private set; }
+    private int _maxTiles;
 
-    public int CurrentTick => _clock;
+    private Queue<int[]> _noughtPlacements;
+    private Queue<int[]> _crossPlacements;
 
-    public State(int size)
+    public Board(int size, int maxTiles = 0)
     {
-        if (size < 3)
+        if (size < 3 || size > 5)
         {
             throw new ArgumentOutOfRangeException(
-                $"Invalid size passed ({size}), must be >= 3"
+                $"Invalid size passed ({size}), must be between 3 and 5 (inclusive)"
+            );
+        }
+
+        if (maxTiles > 0 && maxTiles < size)
+        {
+            throw new ArgumentOutOfRangeException(
+                $"Invalid max tiles passed ({maxTiles}), if enabled should be at least {maxTiles}"
             );
         }
 
         _tiles = new Tile[size, size];
-        _placementTime = new int[size, size];
 
         for (var i = 0; i < size; i++)
-        {
             for (var j = 0; j < size; j++)
-            {
                 _tiles[i,j] = Tile.Empty;
-                _placementTime[i,j] = -1;
-            }
-        }
 
-        _clock = 0;
-        _size = size;
+        Size = size;
+        _maxTiles = maxTiles;
+        _noughtPlacements = new();
+        _crossPlacements = new();
     }
 
-    public void EmptyTile(Tile tile, int i, int j)
+    public Tile this[int i, int j]
     {
-        ValidateBoardCoordinate(i, j);
-        _tiles[i,j] = Tile.Empty;
-        _placementTime[i,j] = -1;
+        get => _tiles[i,j];
     }
 
     public bool TryPlaceTile(Tile tile, int i, int j)
@@ -49,10 +50,18 @@ public class State
         if (_tiles[i,j] != Tile.Empty)
             return false;
 
-        _clock++;
-
         _tiles[i,j] = tile;
-        _placementTime[i,j] = _clock;
+
+        // Record placement in one of the queues
+        var queue = tile == Tile.Cross ? _crossPlacements : _noughtPlacements;
+        queue.Enqueue(new[] { i, j });
+
+        // Have we exceeded the number of allowed tiles?
+        if (queue.Count > _maxTiles && _maxTiles > 0)
+        {
+            var toRemove = queue.Dequeue();
+            _tiles[toRemove[0], toRemove[1]] = Tile.Empty;
+        }
 
         return true;
     }
@@ -64,9 +73,9 @@ public class State
         var leadingDiagonalWin = true;
         var leadingDiagonalTile = _tiles[0,0];
         var otherDiagonalWin = true;
-        var otherDiagonalTile = _tiles[_size - 1, 0];
+        var otherDiagonalTile = _tiles[Size - 1, 0];
 
-        for (var i = 0; i < _size; i++)
+        for (var i = 0; i < Size; i++)
         {
             // Check i-th row and column
             var rowWin = true;
@@ -75,7 +84,7 @@ public class State
             var colTile = _tiles[0,i];
 
             // Can skip one tile
-            for (var j = 1; j < _size; j++)
+            for (var j = 1; j < Size; j++)
             {
                 var currentRow = _tiles[i,j];
                 var currentCol = _tiles[j,i];
@@ -86,8 +95,8 @@ public class State
                     foundEmpty = true;
 
                 // Potential Win if the tiles match and they aren't empty
-                rowWin = rowTile == currentRow && currentRow != Tile.Empty;
-                colWin = colTile == currentCol && currentCol != Tile.Empty;
+                rowWin = rowWin && rowTile == currentRow && currentRow != Tile.Empty;
+                colWin = colWin && colTile == currentCol && currentCol != Tile.Empty;
             }
 
             // Check if we found a row or column win
@@ -111,10 +120,10 @@ public class State
 
             // Continue checking diagonal
             var currentLeading = _tiles[i,i];
-            var currentOther = _tiles[_size - 1 - i, _size - 1 - i];
+            var currentOther = _tiles[Size - 1 - i, Size - 1 - i];
 
-            leadingDiagonalWin = leadingDiagonalTile == currentLeading && currentLeading != Tile.Empty;
-            otherDiagonalWin = otherDiagonalTile == currentOther && currentOther != Tile.Empty;
+            leadingDiagonalWin = leadingDiagonalWin && leadingDiagonalTile == currentLeading && currentLeading != Tile.Empty;
+            otherDiagonalWin = otherDiagonalWin && otherDiagonalTile == currentOther && currentOther != Tile.Empty;
         }
 
         // Check if we got a diagonal win
@@ -139,10 +148,10 @@ public class State
 
     private void ValidateBoardCoordinate(int i, int j)
     {
-        if (i < 0 || i >= _size)
+        if (i < 0 || i >= Size)
             throw new ArgumentOutOfRangeException($"i is out of range; passed {i}");
         
-        if (j < 0 || j >= _size)
+        if (j < 0 || j >= Size)
             throw new ArgumentOutOfRangeException($"j is out of range; passed {j}");
     }
 }
