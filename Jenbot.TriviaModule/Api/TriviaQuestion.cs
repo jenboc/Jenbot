@@ -1,18 +1,31 @@
 using Newtonsoft.Json;
+using Jenbot.Utils;
 
 namespace Jenbot.TriviaModule.Api;
 
 public class TriviaQuestion
 {
-    [JsonProperty("category")] public string Category { get; private set; }
+    [JsonProperty("category")]
+    [JsonConverter(typeof(HtmlDecodeConverter))]
+    public required string Category { get; set; }
 
-    [JsonProperty("type")] public string Type { get; private set; }
+    [JsonProperty("type")] 
+    [JsonConverter(typeof(HtmlDecodeConverter))]
+    public required string Type { get; set; }
 
-    [JsonProperty("difficulty")] public string Difficulty { get; private set; }
+    [JsonProperty("difficulty")] 
+    [JsonConverter(typeof(HtmlDecodeConverter))]
+    public required string Difficulty { get; set; }
 
-    [JsonProperty("question")] public string Question { get; private set; }
+    [JsonProperty("question")] 
+    [JsonConverter(typeof(HtmlDecodeConverter))]
+    public required string Question { get; set; }
 
-    [JsonProperty("correct_answer")] public string CorrectAnswer { get; private set; }
+    [JsonProperty("correct_answer")] 
+    [JsonConverter(typeof(HtmlDecodeConverter))]
+    public required string CorrectAnswer { get; set; }
 
-    [JsonProperty("incorrect_answers")] public string[] IncorrectAnswers { get; private set; }
+    [JsonProperty("incorrect_answers")] 
+    [JsonConverter(typeof(HtmlDecodeArrayConverter))]
+    public required string[] IncorrectAnswers { get; set; }
 }
