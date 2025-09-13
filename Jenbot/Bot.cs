@@ -33,7 +33,8 @@ public class Bot
             Token = _config.Token,
             TokenType = TokenType.Bot,
             Intents = intents,
-            MinimumLogLevel = LogLevel.Debug
+            MinimumLogLevel = LogLevel.Debug,
+            AutoReconnect = true
         };
         _client = new DiscordClient(discordConfig);
     
