@@ -83,6 +83,22 @@ public class TriviaInstance
         if (_messageId == null || _ctx == null)
             return;
 
+        // If another user clicked the button then we just send them an
+        // empherial message with the result
+        if (_ctx.User != interaction.User)
+        {
+            var msg = wasCorrect
+                ? "This wasn't your trivia... but your answer was correct"
+                : "Not only was this not yours to answer... you were also wrong.";
+
+            await interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
+                    new DiscordInteractionResponseBuilder()
+                        .WithContent($"{interaction.User.Mention} {msg}")
+                        .AsEphemeral(true)
+            );
+            return;
+        }
+
         var embed = (new TriviaEmbedBuilder(_question)).Build();
         var colouredButtons = CreateButtons(true, false);
         var buttonComponents = colouredButtons.Select(b => b.GetComponent());        
