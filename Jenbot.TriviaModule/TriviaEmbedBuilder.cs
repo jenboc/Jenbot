@@ -1,4 +1,4 @@
-﻿using System.Web;
+﻿using System.Globalization;
 using DSharpPlus.Entities;
 using Jenbot.TriviaModule.Api;
 
@@ -12,9 +12,17 @@ public class TriviaEmbedBuilder
     {
         _builder = new DiscordEmbedBuilder();
 
-        _builder.WithTitle(HttpUtility.HtmlDecode(question.Question));
-        _builder.AddField("Difficulty", question.Difficulty);
-        _builder.AddField("Category", question.Category); 
+        var textInfo = new CultureInfo("en-GB", false).TextInfo;
+
+        _builder.WithTitle(question.Question);
+        _builder.AddField(
+                "Difficulty",
+                textInfo.ToTitleCase(question.Difficulty)
+        );
+        _builder.AddField(
+                "Category", 
+                textInfo.ToTitleCase(question.Category)
+        ); 
     }
 
     public DiscordEmbed Build() => _builder.Build();
