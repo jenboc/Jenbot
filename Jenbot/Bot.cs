@@ -27,7 +27,9 @@ public class Bot
         // Instantiate Client 
         var intents = DiscordIntents.MessageContents
             | DiscordIntents.GuildMessages
-            | DiscordIntents.DirectMessages;
+            | DiscordIntents.DirectMessages
+            | DiscordIntents.Guilds
+            | DiscordIntents.GuildMembers;
         var discordConfig = new DiscordConfiguration()
         {
             Token = _config.Token,
@@ -85,6 +87,7 @@ public class Bot
         slash.RegisterCommands<TriviaModule.TriviaModule>();
         slash.RegisterCommands<MathsModule.MathsModule>();
         slash.RegisterCommands<GamesModule.GamesModule>();
+        slash.RegisterCommands<MiscModule.MiscModule>();
     }
 
     /// <summary>

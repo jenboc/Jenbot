@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="Jenbot.ChessModule/Jenbot.ChessModule.csproj" />
+  <Project Path="Jenbot.GamesModule/Jenbot.GamesModule.csproj" />
+  <Project Path="Jenbot.Interactions/Jenbot.Interactions.csproj" />
+  <Project Path="Jenbot.MathsModule/Jenbot.MathsModule.csproj" />
+  <Project Path="Jenbot.MiscModule/Jenbot.MiscModule.csproj" />
+  <Project Path="Jenbot.TriviaModule/Jenbot.TriviaModule.csproj" />
+  <Project Path="Jenbot.Utils/Jenbot.Utils.csproj" />
+  <Project Path="Jenbot/Jenbot.csproj" />
+</Solution>
