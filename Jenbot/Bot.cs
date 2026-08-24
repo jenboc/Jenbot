@@ -27,7 +27,9 @@ public class Bot
         // Instantiate Client 
         var intents = DiscordIntents.MessageContents
             | DiscordIntents.GuildMessages
-            | DiscordIntents.DirectMessages;
+            | DiscordIntents.DirectMessages
+            | DiscordIntents.Guilds
+            | DiscordIntents.GuildMembers;
         var discordConfig = new DiscordConfiguration()
         {
             Token = _config.Token,
